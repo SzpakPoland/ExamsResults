@@ -11,5 +11,95 @@
     "percentage": 113.33,
     "passed": true,
     "examType": "sprawdzanie"
+  },
+  {
+    "id": 1754606948165,
+    "timestamp": "2025-08-07T22:49:08.165Z",
+    "nick": "test",
+    "date": "2025-08-07",
+    "bonusPoints": 37,
+    "totalPoints": 37,
+    "maxPoints": 33,
+    "percentage": 112.12,
+    "passed": true,
+    "examType": "sprawdzanie",
+    "questionResults": [
+      {
+        "questionId": 1,
+        "passed": false,
+        "pointsEarned": 0
+      },
+      {
+        "questionId": 2,
+        "passed": false,
+        "pointsEarned": 0
+      },
+      {
+        "questionId": 3,
+        "passed": false,
+        "pointsEarned": 0
+      },
+      {
+        "questionId": 4,
+        "passed": false,
+        "pointsEarned": 0
+      },
+      {
+        "questionId": 5,
+        "passed": false,
+        "pointsEarned": 0
+      },
+      {
+        "questionId": 6,
+        "passed": false,
+        "pointsEarned": 0
+      },
+      {
+        "questionId": 7,
+        "passed": false,
+        "pointsEarned": 0
+      },
+      {
+        "questionId": 8,
+        "passed": false,
+        "pointsEarned": 0
+      },
+      {
+        "questionId": 9,
+        "passed": false,
+        "pointsEarned": 0
+      },
+      {
+        "questionId": 10,
+        "passed": false,
+        "pointsEarned": 0
+      },
+      {
+        "questionId": 11,
+        "passed": false,
+        "pointsEarned": 0
+      },
+      {
+        "questionId": 12,
+        "passed": false,
+        "pointsEarned": 0
+      },
+      {
+        "questionId": 13,
+        "passed": false,
+        "pointsEarned": 0
+      },
+      {
+        "questionId": 14,
+        "passed": false,
+        "pointsEarned": 0
+      },
+      {
+        "questionId": 15,
+        "passed": false,
+        "pointsEarned": 0
+      }
+    ],
+    "notes": "testowanotatka"
   }
 ]

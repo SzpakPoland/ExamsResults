@@ -22,8 +22,6 @@ export default function LoginForm() {
     setLoading(true)
     setError('')
 
-    console.log('Attempting login with:', formData.username, formData.password)
-
     const success = await login(formData.username, formData.password)
     
     if (!success) {
@@ -143,24 +141,9 @@ export default function LoginForm() {
               )}
             </button>
           </form>
-
-          {/* Demo Credentials - zaktualizowane */}
-          <motion.div
-            className="mt-6 p-4 bg-blue-50/50 rounded-lg border border-blue-200/50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-          >
-            <p className="text-sm font-medium text-blue-800 mb-2">Dane testowe:</p>
-            <div className="text-xs text-blue-700 space-y-1">
-              <p><strong>Super Admin:</strong> superadmin / admin123</p>
-              <p><strong>Admin:</strong> admin / admin123</p>
-              <p><strong>Nauczyciel:</strong> teacher / teacher123</p>
-              <p><strong>Użytkownik:</strong> user / user123</p>
-            </div>
-          </motion.div>
         </motion.div>
       </motion.div>
     </div>
   )
 }
+

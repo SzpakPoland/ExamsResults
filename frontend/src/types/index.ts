@@ -67,7 +67,7 @@ export interface UserFormData {
   username: string;
   password: string;
   role: string;
-  name: string;
+  name: string; // To pole dalej nazywa się 'name' w API, ale w UI pokazuje się jako "Nazwa konta"
 }
 
 export interface AuthState {

@@ -276,7 +276,7 @@ export default function AdminPage() {
                   <tr className="border-b border-gray-200">
                     <th className="text-left py-3 px-4 font-semibold text-gray-700">ID</th>
                     <th className="text-left py-3 px-4 font-semibold text-gray-700">Użytkownik</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Imię i nazwisko</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Nazwa konta</th>
                     <th className="text-left py-3 px-4 font-semibold text-gray-700">Rola</th>
                     <th className="text-center py-3 px-4 font-semibold text-gray-700">Akcje</th>
                   </tr>
