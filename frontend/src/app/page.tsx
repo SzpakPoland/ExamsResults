@@ -21,7 +21,7 @@ const examTypes = [
     gradient: 'from-green-500 to-green-700',
   },
   {
-    name: 'Dokumenty Administracyjne',
+    name: 'Dokumenty',
     description: 'Test z maksymalną i zdobytą liczbą punktów',
     href: '/dokumenty',
     icon: FileText,
@@ -113,21 +113,21 @@ export default function HomePage() {
           >
             <Link
               href={examType.href}
-              className="group block card-glass p-8 hover:scale-[1.02] transition-all duration-300 border border-white/30 hover:border-white/50"
+              className="group block card-glass p-8 hover:scale-[1.02] transition-all duration-300 border border-white/30 hover:border-white/50 h-full"
             >
               <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r ${examType.gradient} mb-6 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
                 <examType.icon className="w-8 h-8 text-white" />
               </div>
               
-              <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:gradient-text transition-all duration-300">
+              <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:gradient-text transition-all duration-300 min-h-[3.5rem] flex items-center">
                 {examType.name}
               </h3>
               
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 leading-relaxed mb-6 min-h-[4.5rem]">
                 {examType.description}
               </p>
               
-              <div className="mt-4 flex items-center text-primary-600 group-hover:text-primary-700 transition-colors duration-300">
+              <div className="mt-auto flex items-center text-primary-600 group-hover:text-primary-700 transition-colors duration-300">
                 <span className="text-sm font-semibold">Rozpocznij test</span>
                 <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
