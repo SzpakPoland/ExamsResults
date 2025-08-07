@@ -1,0 +1,82 @@
+export interface ExamResult {
+  id: number;
+  nick: string;
+  date?: string;
+  errors?: number;
+  bonusPoints?: number;
+  totalPoints: number;
+  maxPoints: number;
+  percentage: number;
+  passed: boolean;
+  timestamp: string;
+  attempt?: string;
+  examType: 'sprawdzanie' | 'ortografia' | 'dokumenty';
+  questionResults?: QuestionResult[];
+  notes?: string;
+}
+
+export interface Question {
+  id: number;
+  text: string;
+  maxPoints: number;
+}
+
+export interface QuestionResult {
+  questionId: number;
+  passed: boolean;
+  pointsEarned: number;
+}
+
+export interface SprawdzanieFormData {
+  nick: string;
+  date: string;
+  questionResults: QuestionResult[];
+  bonusPoints: number;
+  notes: string;
+}
+
+export interface OrtografiaFormData {
+  nick: string;
+  attempt: string;
+  percentage: number;
+}
+
+export interface DokumentyFormData {
+  nick: string;
+  date: string;
+  maxPoints: number;
+  achievedPoints: number;
+}
+
+export interface NavigationItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+export type ExamType = 'sprawdzanie' | 'ortografia' | 'dokumenty';
+
+export interface User {
+  id: number;
+  username: string;
+  role: string;
+  name: string;
+}
+
+export interface UserFormData {
+  username: string;
+  password: string;
+  role: string;
+  name: string;
+}
+
+export interface AuthState {
+  isAuthenticated: boolean;
+  user: User | null;
+  token: string | null;
+}
+
+export interface LoginFormData {
+  username: string;
+  password: string;
+}

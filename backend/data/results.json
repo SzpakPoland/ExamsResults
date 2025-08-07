@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1754604367327,
+    "timestamp": "2025-08-07T22:06:07.327Z",
+    "nick": "test",
+    "date": "2025-07-31",
+    "errors": 1,
+    "bonusPoints": 3,
+    "totalPoints": 17,
+    "maxPoints": 15,
+    "percentage": 113.33,
+    "passed": true,
+    "examType": "sprawdzanie"
+  }
+]

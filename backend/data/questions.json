@@ -1,0 +1,77 @@
+[
+  {
+    "id": 1,
+    "text": "Jakie są podstawowe zasady bezpieczeństwa w sieci?",
+    "maxPoints": 2
+  },
+  {
+    "id": 2,
+    "text": "Wymień trzy najważniejsze protokoły sieciowe.",
+    "maxPoints": 3
+  },
+  {
+    "id": 3,
+    "text": "Co to jest adres IP i jak się go konfiguruje?",
+    "maxPoints": 2
+  },
+  {
+    "id": 4,
+    "text": "Jakie są różnice między TCP a UDP?",
+    "maxPoints": 2
+  },
+  {
+    "id": 5,
+    "text": "Jak działa system DNS?",
+    "maxPoints": 2
+  },
+  {
+    "id": 6,
+    "text": "Co to jest firewall i jakie są jego funkcje?",
+    "maxPoints": 2
+  },
+  {
+    "id": 7,
+    "text": "Wymień podstawowe polecenia w systemie Windows.",
+    "maxPoints": 3
+  },
+  {
+    "id": 8,
+    "text": "Co to jest Active Directory?",
+    "maxPoints": 2
+  },
+  {
+    "id": 9,
+    "text": "Jakie są rodzaje kopii zapasowych?",
+    "maxPoints": 2
+  },
+  {
+    "id": 10,
+    "text": "Jak skonfigurować serwer DHCP?",
+    "maxPoints": 3
+  },
+  {
+    "id": 11,
+    "text": "Co to jest VPN i jak działa?",
+    "maxPoints": 2
+  },
+  {
+    "id": 12,
+    "text": "Jakie są podstawowe zasady tworzenia haseł?",
+    "maxPoints": 2
+  },
+  {
+    "id": 13,
+    "text": "Co to jest malware i jak się przed nim chronić?",
+    "maxPoints": 2
+  },
+  {
+    "id": 14,
+    "text": "Jak działa protokół HTTP/HTTPS?",
+    "maxPoints": 2
+  },
+  {
+    "id": 15,
+    "text": "Co to jest load balancer?",
+    "maxPoints": 2
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "id": 0,
+    "username": "superadmin",
+    "password": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    "role": "superadmin",
+    "name": "Super Administrator"
+  },
+  {
+    "id": 1,
+    "username": "SzpakPL",
+    "password": "68fb72c3b7f8575a47ca840cc61bd3b9d4dc80250e0ce5d8fee9dcbe9ee9cf11",
+    "role": "admin",
+    "name": "SzpakPL"
+  }
+]
