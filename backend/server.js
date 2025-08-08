@@ -543,7 +543,6 @@ app.listen(PORT, () => {
     console.log(`🔐 Passwords are stored as plain text`);
     console.log(`👤 Test accounts: superadmin/superadmin123, admin/admin123, teacher/teacher123, user/user123`);
 });
-});
 
 // 404 handler
 app.use('*', (req, res) => {
