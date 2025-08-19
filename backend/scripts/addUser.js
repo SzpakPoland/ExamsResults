@@ -1,10 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
-
-const hashPassword = (password) => {
-    return crypto.createHash('sha256').update(password).digest('hex');
-};
 
 // Get arguments from command line
 const [username, password, role, name] = process.argv.slice(2);
@@ -35,11 +30,11 @@ try {
     // Get next ID
     const nextId = Math.max(...users.map(u => u.id)) + 1;
     
-    // Create new user
+    // Create new user with plain text password
     const newUser = {
         id: nextId,
         username,
-        password: hashPassword(password),
+        password: password, // Store plain text password
         role,
         name
     };
@@ -57,7 +52,12 @@ try {
     console.log(`   Username: ${username}`);
     console.log(`   Role: ${role}`);
     console.log(`   Name: ${name}`);
-    console.log(`   Password Hash: ${newUser.password}`);
+    console.log(`   Password: ${password} (plain text)`);
+    
+} catch (error) {
+    console.error('❌ Błąd podczas dodawania użytkownika:', error.message);
+    process.exit(1);
+}
     
 } catch (error) {
     console.error('❌ Błąd podczas dodawania użytkownika:', error.message);

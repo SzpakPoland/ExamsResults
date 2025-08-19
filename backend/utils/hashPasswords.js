@@ -1,11 +1,11 @@
-const crypto = require('crypto');
-
-// Utility to hash passwords
-const hashPassword = (password) => {
-    return crypto.createHash('sha256').update(password).digest('hex');
-};
-
-// Get password from command line argument
+// This file is no longer needed as passwords are stored in plain text
+console.log('❌ This utility is deprecated - passwords are now stored as plain text');
+console.log('');
+console.log('Current default passwords:');
+console.log('  superadmin: superadmin123');
+console.log('  admin:      admin123');
+console.log('  teacher:    teacher123');
+console.log('  user:       user123');
 const password = process.argv[2];
 
 if (!password) {

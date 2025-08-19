@@ -3,7 +3,6 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
 
 const app = express();
 const PORT = 3001;
@@ -29,11 +28,6 @@ const initDataFile = (filePath, defaultData = []) => {
     }
 };
 
-// Hash password function - upewnij się że używamy SHA-256
-const hashPassword = (password) => {
-    return crypto.createHash('sha256').update(password).digest('hex');
-};
-
 initDataFile(resultsFile);
 initDataFile(questionsFile, [
     {
@@ -47,33 +41,33 @@ initDataFile(questionsFile, [
         "maxPoints": 3
     }
 ]);
-// Initialize users file with hashed passwords including superadmin
+// Initialize users file with plain text passwords
 initDataFile(usersFile, [
     {
         "id": 0,
         "username": "superadmin", 
-        "password": hashPassword("superadmin123"),
+        "password": "superadmin123",
         "role": "superadmin",
         "name": "Super Administrator"
     },
     {
         "id": 1,
         "username": "admin",
-        "password": hashPassword("admin123"),
+        "password": "admin123",
         "role": "admin",
         "name": "Administrator"
     },
     {
         "id": 2,
         "username": "teacher",
-        "password": hashPassword("teacher123"),
+        "password": "teacher123",
         "role": "teacher",
         "name": "Nauczyciel"
     },
     {
         "id": 3,
         "username": "user",
-        "password": hashPassword("user123"),
+        "password": "user123",
         "role": "user",
         "name": "Użytkownik"
     }
@@ -267,7 +261,7 @@ app.get('/api/stats', (req, res) => {
     }
 });
 
-// Authentication endpoint - dodaj szczegółowe debugowanie
+// Authentication endpoint - simple plain text password comparison
 app.post('/api/auth/login', (req, res) => {
     try {
         const { username, password } = req.body;
@@ -293,19 +287,11 @@ app.post('/api/auth/login', (req, res) => {
         }
         
         console.log('Found user:', foundUser.username, 'role:', foundUser.role);
-        console.log('Stored password hash:', foundUser.password);
+        console.log('Stored password:', foundUser.password);
+        console.log('Input password:', password);
+        console.log('Password match:', foundUser.password === password);
         
-        const hashedPassword = hashPassword(password);
-        console.log('Generated hash for input password:', hashedPassword);
-        console.log('Hash match:', foundUser.password === hashedPassword);
-        
-        // Test with known passwords
-        console.log('Test hashes:');
-        console.log('admin123 hash:', hashPassword('admin123'));
-        console.log('teacher123 hash:', hashPassword('teacher123'));
-        console.log('user123 hash:', hashPassword('user123'));
-        
-        if (foundUser.password === hashedPassword) {
+        if (foundUser.password === password) {
             console.log('✅ Login successful for:', username);
             const { password: _, ...userWithoutPassword } = foundUser;
             res.json({
@@ -392,7 +378,7 @@ app.get('/api/users', (req, res) => {
     }
 });
 
-// Create user (superadmin only)
+// Create user (superadmin only) - with plain text password
 app.post('/api/users', (req, res) => {
     try {
         const authHeader = req.headers.authorization;
@@ -433,7 +419,7 @@ app.post('/api/users', (req, res) => {
             const newUser = {
                 id: nextId,
                 username,
-                password: hashPassword(password),
+                password: password, // Store plain text password
                 role,
                 name
             };
@@ -455,7 +441,7 @@ app.post('/api/users', (req, res) => {
     }
 });
 
-// Update user (superadmin only)
+// Update user (superadmin only) - with plain text password
 app.put('/api/users/:id', (req, res) => {
     try {
         const authHeader = req.headers.authorization;
@@ -488,7 +474,7 @@ app.put('/api/users/:id', (req, res) => {
             }
 
             if (username) users[userIndex].username = username;
-            if (password) users[userIndex].password = hashPassword(password);
+            if (password) users[userIndex].password = password; // Store plain text password
             if (role) users[userIndex].role = role;
             if (name) users[userIndex].name = name;
 
@@ -619,6 +605,19 @@ app.get('/api/health', (req, res) => {
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Something went wrong!' });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+    res.status(404).json({ error: 'Endpoint not found' });
+});
+
+app.listen(PORT, () => {
+    console.log(`✅ Server running on port ${PORT}`);
+    console.log(`📊 API endpoints available at http://localhost:${PORT}/api/`);
+    console.log(`💾 Data stored in: ${dataDir}`);
+    console.log(`🔐 Passwords are stored as plain text`);
+    console.log(`👤 Test accounts: superadmin/superadmin123, admin/admin123, teacher/teacher123, user/user123`);
 });
 
 // 404 handler

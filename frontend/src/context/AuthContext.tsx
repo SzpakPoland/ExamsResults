@@ -23,9 +23,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Check for stored token on app start
-    const storedToken = localStorage.getItem('auth-token')
-    if (storedToken) {
-      verifyToken(storedToken)
+    if (typeof window !== 'undefined') {
+      const storedToken = localStorage.getItem('auth-token')
+      if (storedToken) {
+        verifyToken(storedToken)
+      } else {
+        setIsLoading(false)
+      }
     } else {
       setIsLoading(false)
     }
@@ -34,11 +38,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const verifyToken = async (token: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/verify`, {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ token }),
       })
 
       if (response.ok) {
@@ -50,7 +54,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         })
       } else {
         // Invalid token, remove it
-        localStorage.removeItem('auth-token')
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('auth-token')
+        }
         setAuthState({
           isAuthenticated: false,
           user: null,
@@ -59,7 +65,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error('Token verification failed:', error)
-      localStorage.removeItem('auth-token')
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth-token')
+      }
       setAuthState({
         isAuthenticated: false,
         user: null,
@@ -101,7 +109,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = () => {
-    localStorage.removeItem('auth-token')
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('auth-token')
+    }
     setAuthState({
       isAuthenticated: false,
       user: null,
