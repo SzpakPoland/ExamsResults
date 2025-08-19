@@ -72,7 +72,14 @@ export default function DokumentyPage() {
 
   const resetForm = () => {
     setResult(null)
-    setFormData({ nick: '', date: '', maxPoints: 0, achievedPoints: 0, bonusPoints: 0, notes: '' })
+    setFormData({ 
+      nick: '', 
+      date: '', 
+      maxPoints: 0, 
+      achievedPoints: 0, 
+      bonusPoints: 0, 
+      notes: '' 
+    })
   }
 
   const currentPercentage = formData.maxPoints > 0 ? Math.round((formData.achievedPoints / formData.maxPoints) * 100) : 0

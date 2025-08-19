@@ -48,7 +48,8 @@ export interface DokumentyFormData {
   date: string;
   maxPoints: number;
   achievedPoints: number;
-  notes: string;
+  bonusPoints?: number;
+  notes?: string;
 }
 
 export interface NavigationItem {
