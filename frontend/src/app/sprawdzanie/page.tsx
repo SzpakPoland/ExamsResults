@@ -77,9 +77,22 @@ export default function SprawdzaniePage() {
   }
 
   const calculateResults = () => {
-    const totalMaxPoints = questions.reduce((sum, q) => sum + q.maxPoints, 0)
+    if (questions.length === 0) return { totalMaxPoints: 0, earnedPoints: 0, totalPoints: 0, percentage: 0, passed: false }
+    
+    const baseMaxPoints = questions.reduce((sum, q) => sum + q.maxPoints, 0)
+    const totalMaxPoints = baseMaxPoints + formData.bonusPoints // Dodaj bonusy do puli wszystkich punktów
     const earnedPoints = formData.questionResults.reduce((sum, qr) => sum + qr.pointsEarned, 0)
-    const totalPoints = earnedPoints + formData.bonusPoints
+    const totalPoints = earnedPoints + formData.bonusPoints // Dodaj bonusy do zdobytych punktów
+    
+    console.log('Calculation debug:', {
+      questionsCount: questions.length,
+      baseMaxPoints,
+      bonusPoints: formData.bonusPoints,
+      totalMaxPoints,
+      earnedPoints,
+      totalPoints
+    })
+    
     const percentage = totalMaxPoints > 0 ? (totalPoints / totalMaxPoints) * 100 : 0
     const passed = percentage >= 75
 
@@ -216,7 +229,7 @@ export default function SprawdzaniePage() {
     )
   }
 
-  const { totalPoints, percentage, passed } = calculateResults()
+  const { totalMaxPoints, totalPoints, percentage, passed } = calculateResults()
 
   return (
     <Layout title="Test Sprawdzania">
@@ -396,7 +409,11 @@ export default function SprawdzaniePage() {
                 <div className="bg-gradient-to-r from-blue-50/50 to-indigo-50/50 p-4 rounded-xl border-2 border-blue-200/50">
                   <h3 className="font-semibold text-blue-800 mb-2">Podsumowanie:</h3>
                   <div className="text-sm space-y-1">
-                    <p><strong>Łączne punkty:</strong> {totalPoints}</p>
+                    <p><strong>Pytania załadowane:</strong> {questions.length}</p>
+                    <p><strong>Punkty bazowe:</strong> {questions.reduce((sum, q) => sum + q.maxPoints, 0)}</p>
+                    <p><strong>Punkty dodatkowe:</strong> +{formData.bonusPoints}</p>
+                    <p><strong>Maksymalne punkty:</strong> {totalMaxPoints}</p>
+                    <p><strong>Zdobyte punkty:</strong> {totalPoints}</p>
                     <p><strong>Procent:</strong> {percentage.toFixed(1)}%</p>
                     <p className={`font-bold ${passed ? 'text-green-700' : 'text-red-700'}`}>
                       Status: {passed ? 'ZALICZONY' : 'NIEZALICZONY'}

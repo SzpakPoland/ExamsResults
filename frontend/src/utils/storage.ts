@@ -200,3 +200,27 @@ export const deleteUser = async (id: number): Promise<void> => {
     throw error
   }
 }
+
+export const changePassword = async (currentPassword: string, newPassword: string): Promise<boolean> => {
+  try {
+    const token = localStorage.getItem('auth-token')
+    const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ currentPassword, newPassword })
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to change password')
+    }
+
+    return true
+  } catch (error) {
+    console.error('Error changing password:', error)
+    throw error
+  }
+}

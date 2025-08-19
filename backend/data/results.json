@@ -101,5 +101,95 @@
       }
     ],
     "notes": "testowanotatka"
+  },
+  {
+    "id": 1755601174556,
+    "timestamp": "2025-08-19T10:59:34.556Z",
+    "nick": "test",
+    "date": "2025-08-19",
+    "bonusPoints": 14,
+    "totalPoints": 46,
+    "maxPoints": 47,
+    "percentage": 97.87,
+    "passed": true,
+    "examType": "sprawdzanie",
+    "questionResults": [
+      {
+        "questionId": 1,
+        "passed": true,
+        "pointsEarned": 2
+      },
+      {
+        "questionId": 2,
+        "passed": true,
+        "pointsEarned": 3
+      },
+      {
+        "questionId": 3,
+        "passed": true,
+        "pointsEarned": 2
+      },
+      {
+        "questionId": 4,
+        "passed": true,
+        "pointsEarned": 2
+      },
+      {
+        "questionId": 5,
+        "passed": true,
+        "pointsEarned": 2
+      },
+      {
+        "questionId": 6,
+        "passed": true,
+        "pointsEarned": 2
+      },
+      {
+        "questionId": 7,
+        "passed": true,
+        "pointsEarned": 3
+      },
+      {
+        "questionId": 8,
+        "passed": true,
+        "pointsEarned": 2
+      },
+      {
+        "questionId": 9,
+        "passed": true,
+        "pointsEarned": 2
+      },
+      {
+        "questionId": 10,
+        "passed": true,
+        "pointsEarned": 3
+      },
+      {
+        "questionId": 11,
+        "passed": true,
+        "pointsEarned": 2
+      },
+      {
+        "questionId": 12,
+        "passed": true,
+        "pointsEarned": 2
+      },
+      {
+        "questionId": 13,
+        "passed": true,
+        "pointsEarned": 2
+      },
+      {
+        "questionId": 14,
+        "passed": true,
+        "pointsEarned": 1
+      },
+      {
+        "questionId": 15,
+        "passed": true,
+        "pointsEarned": 2
+      }
+    ],
+    "notes": "testowa notatka ... .asd[ ]As\n"
   }
 ]

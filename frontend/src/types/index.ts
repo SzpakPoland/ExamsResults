@@ -37,8 +37,10 @@ export interface SprawdzanieFormData {
 
 export interface OrtografiaFormData {
   nick: string;
-  attempt: string;
+  attempt: number;
   percentage: number;
+  date: string;
+  notes: string;
 }
 
 export interface DokumentyFormData {
@@ -46,6 +48,7 @@ export interface DokumentyFormData {
   date: string;
   maxPoints: number;
   achievedPoints: number;
+  notes: string;
 }
 
 export interface NavigationItem {
@@ -59,7 +62,7 @@ export type ExamType = 'sprawdzanie' | 'ortografia' | 'dokumenty';
 export interface User {
   id: number;
   username: string;
-  role: string;
+  role: 'superadmin' | 'administrator' | 'cmd' | 'user';
   name: string;
 }
 
@@ -79,4 +82,10 @@ export interface AuthState {
 export interface LoginFormData {
   username: string;
   password: string;
+}
+
+export interface ChangePasswordFormData {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }

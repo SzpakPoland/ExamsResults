@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { PenTool, User, RotateCcw, Percent, Save, CheckCircle, XCircle } from 'lucide-react'
+import { PenTool, User, RotateCcw, Percent, Save, CheckCircle, XCircle, MessageSquare } from 'lucide-react'
 import Layout from '@/components/ui/Layout'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { saveResult } from '@/utils/storage'
@@ -12,7 +12,8 @@ export default function OrtografiaPage() {
   const [formData, setFormData] = useState<OrtografiaFormData>({
     nick: '',
     attempt: 'Pierwsze',
-    percentage: 0
+    percentage: 0,
+    notes: ''
   })
   const [result, setResult] = useState<ExamResult | null>(null)
   const [loading, setLoading] = useState(false)
@@ -25,7 +26,7 @@ export default function OrtografiaPage() {
     return () => clearTimeout(timer)
   }, [])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
@@ -37,32 +38,39 @@ export default function OrtografiaPage() {
     e.preventDefault()
     setLoading(true)
     
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    const totalWords = 20
+    const achievedPoints = Math.round(((formData.percentage || 0) / 100) * totalWords)
+    const errors = totalWords - achievedPoints
     
-    const percentage = formData.percentage
-    const passed = percentage >= 75
+    try {
+      const newResult: ExamResult = {
+        id: Date.now(),
+        nick: formData.nick,
+        date: formData.date,
+        attempt: formData.attempt,
+        totalPoints: achievedPoints,
+        maxPoints: totalWords,
+        percentage: formData.percentage || 0,
+        passed: (formData.percentage || 0) >= 75,
+        timestamp: new Date().toISOString(),
+        examType: 'ortografia',
+        notes: formData.notes,
+        errors
+      }
 
-    const newResult: ExamResult = {
-      id: Date.now(),
-      nick: formData.nick,
-      attempt: formData.attempt,
-      totalPoints: percentage,
-      maxPoints: 100,
-      percentage,
-      passed,
-      timestamp: new Date().toISOString(),
-      examType: 'ortografia'
+      await saveResult(newResult)
+      setResult(newResult)
+      setFormData({ nick: '', date: '', attempt: 1, percentage: 0, notes: '' })
+    } catch (error) {
+      console.error('Error submitting result:', error)
+    } finally {
+      setLoading(false)
     }
-
-    saveResult(newResult)
-    setResult(newResult)
-    setFormData({ nick: '', attempt: 'Pierwsze', percentage: 0 })
-    setLoading(false)
   }
 
   const resetForm = () => {
     setResult(null)
-    setFormData({ nick: '', attempt: 'Pierwsze', percentage: 0 })
+    setFormData({ nick: '', attempt: 'Pierwsze', percentage: 0, notes: '' })
   }
 
   if (pageLoading) {
@@ -190,6 +198,20 @@ export default function OrtografiaPage() {
                 className="input text-lg font-bold text-center"
                 placeholder="np. 85"
                 required
+              />
+            </div>
+
+            <div>
+              <label className="label">
+                <MessageSquare className="w-4 h-4 inline mr-2" />
+                Notatki
+              </label>
+              <textarea
+                name="notes"
+                value={formData.notes}
+                onChange={handleInputChange}
+                className="input min-h-[80px] resize-none"
+                placeholder="Dodatkowe notatki..."
               />
             </div>
 

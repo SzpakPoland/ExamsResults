@@ -132,6 +132,24 @@ const writeUsers = (users) => {
     }
 };
 
+// Helper function to calculate grade
+const calculateGrade = (errors, bonusPoints, totalQuestions) => {
+    const basePoints = totalQuestions - errors;
+    const totalPoints = basePoints + bonusPoints;
+    const maxPoints = totalQuestions + bonusPoints; // Dodaj bonusy do puli wszystkich punktów
+    const percentage = maxPoints > 0 ? (totalPoints / maxPoints) * 100 : 0;
+    const passed = percentage >= 75;
+    
+    return {
+        errors,
+        bonusPoints: bonusPoints || 0,
+        totalPoints,
+        maxPoints,
+        percentage: Math.round(percentage * 100) / 100,
+        passed
+    };
+};
+
 // Get questions
 app.get('/api/questions', (req, res) => {
     try {
@@ -356,13 +374,13 @@ app.get('/api/users', (req, res) => {
             
             console.log('Token verification - User ID:', userId, 'Found user:', user?.username, 'Role:', user?.role);
             
-            if (user && user.role === 'superadmin') {
+            if (user && (user.role === 'superadmin' || user.role === 'administrator')) {
                 const usersWithoutPasswords = users.map(({ password, ...user }) => user);
                 console.log('Returning users:', usersWithoutPasswords.length);
                 res.json(usersWithoutPasswords);
             } else {
-                console.log('Access denied - not superadmin');
-                res.status(403).json({ error: 'Access denied. Superadmin role required.' });
+                console.log('Access denied - not superadmin or administrator');
+                res.status(403).json({ error: 'Access denied. Admin role required.' });
             }
         } else {
             console.log('Invalid token format');
@@ -395,6 +413,12 @@ app.post('/api/users', (req, res) => {
             }
 
             const { username, password, role, name } = req.body;
+            
+            // Validate role
+            const allowedRoles = ['user', 'cmd', 'administrator'];
+            if (!allowedRoles.includes(role)) {
+                return res.status(400).json({ error: 'Invalid role' });
+            }
             
             if (!username || !password || !role || !name) {
                 return res.status(400).json({ error: 'All fields are required' });
@@ -527,6 +551,58 @@ app.delete('/api/users/:id', (req, res) => {
     } catch (error) {
         console.error('Error deleting user:', error);
         res.status(500).json({ error: 'Failed to delete user' });
+    }
+});
+
+// Change password endpoint
+app.post('/api/auth/change-password', (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        const token = authHeader?.split(' ')[1];
+        
+        if (!token) {
+            return res.status(401).json({ error: 'No token provided' });
+        }
+
+        const { currentPassword, newPassword } = req.body;
+        
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ error: 'Current password and new password are required' });
+        }
+
+        // Verify token
+        const parts = token.split('_');
+        if (parts.length === 3) {
+            const userId = parseInt(parts[1]);
+            const users = readUsers();
+            const userIndex = users.findIndex(u => u.id === userId);
+            
+            if (userIndex === -1) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            const user = users[userIndex];
+            const currentPasswordHash = hashPassword(currentPassword);
+            
+            // Verify current password
+            if (user.password !== currentPasswordHash) {
+                return res.status(400).json({ error: 'Current password is incorrect' });
+            }
+
+            // Update password
+            users[userIndex].password = hashPassword(newPassword);
+            
+            if (writeUsers(users)) {
+                res.json({ message: 'Password changed successfully' });
+            } else {
+                res.status(500).json({ error: 'Failed to update password' });
+            }
+        } else {
+            res.status(401).json({ error: 'Invalid token' });
+        }
+    } catch (error) {
+        console.error('Error changing password:', error);
+        res.status(500).json({ error: 'Failed to change password' });
     }
 });
 

@@ -14,7 +14,7 @@ export default function Layout({ children, title }: LayoutProps) {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       <Navigation />
       
-      <main className="pt-20 px-4 sm:px-6 lg:px-8">
+      <main className="pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {title && (
             <motion.div 

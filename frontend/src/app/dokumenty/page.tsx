@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { FileText, User, Calendar, Target, Trophy, Save, CheckCircle, XCircle } from 'lucide-react'
+import { FileText, User, Calendar, Target, Trophy, Save, CheckCircle, XCircle, MessageSquare } from 'lucide-react'
 import Layout from '@/components/ui/Layout'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { saveResult } from '@/utils/storage'
@@ -38,27 +38,34 @@ export default function DokumentyPage() {
     e.preventDefault()
     setLoading(true)
     
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    const percentage = formData.maxPoints > 0 ? (formData.achievedPoints / formData.maxPoints) * 100 : 0
-    const passed = percentage >= 75
+    try {
+      const maxPointsWithBonus = formData.maxPoints + formData.bonusPoints // Dodaj bonusy do puli wszystkich punktów
+      const totalPointsWithBonus = formData.achievedPoints + formData.bonusPoints // Dodaj bonusy do zdobytych punktów
+      const percentage = maxPointsWithBonus > 0 ? (totalPointsWithBonus / maxPointsWithBonus) * 100 : 0
+      const passed = percentage >= 75
 
-    const newResult: ExamResult = {
-      id: Date.now(),
-      nick: formData.nick,
-      date: formData.date,
-      totalPoints: formData.achievedPoints,
-      maxPoints: formData.maxPoints,
-      percentage: Math.round(percentage * 100) / 100,
-      passed,
-      timestamp: new Date().toISOString(),
-      examType: 'dokumenty'
+      const newResult: ExamResult = {
+        id: Date.now(),
+        nick: formData.nick,
+        date: formData.date,
+        bonusPoints: formData.bonusPoints,
+        totalPoints: totalPointsWithBonus,
+        maxPoints: maxPointsWithBonus,
+        percentage: Math.round(percentage * 100) / 100,
+        passed,
+        timestamp: new Date().toISOString(),
+        examType: 'dokumenty',
+        notes: formData.notes
+      }
+
+      await saveResult(newResult)
+      setResult(newResult)
+      setFormData({ nick: '', date: '', maxPoints: 0, achievedPoints: 0, bonusPoints: 0, notes: '' })
+    } catch (error) {
+      console.error('Error submitting result:', error)
+    } finally {
+      setLoading(false)
     }
-
-    saveResult(newResult)
-    setResult(newResult)
-    setFormData({ nick: '', date: '', maxPoints: 0, achievedPoints: 0 })
-    setLoading(false)
   }
 
   const resetForm = () => {
@@ -220,6 +227,20 @@ export default function DokumentyPage() {
                   required
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="label">
+                <MessageSquare className="w-4 h-4 inline mr-2" />
+                Notatki
+              </label>
+              <textarea
+                name="notes"
+                value={formData.notes}
+                onChange={handleInputChange}
+                className="input min-h-[80px] resize-none"
+                placeholder="Dodatkowe notatki..."
+              />
             </div>
 
             <div className="bg-gradient-to-r from-blue-50/50 to-indigo-50/50 p-4 rounded-xl border-2 border-blue-200/50 backdrop-blur-sm">

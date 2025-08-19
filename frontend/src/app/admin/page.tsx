@@ -234,8 +234,8 @@ export default function AdminPage() {
                   required
                 >
                   <option value="user">Użytkownik</option>
-                  <option value="teacher">Nauczyciel</option>
-                  <option value="admin">Administrator</option>
+                  <option value="cmd">CMD (tylko ortografia)</option>
+                  <option value="administrator">Administrator</option>
                   {user?.id === editingUser?.id && (
                     <option value="superadmin">Super Administrator</option>
                   )}
@@ -290,13 +290,13 @@ export default function AdminPage() {
                       <td className="py-3 px-4">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           userData.role === 'superadmin' ? 'bg-red-100 text-red-800' :
-                          userData.role === 'admin' ? 'bg-blue-100 text-blue-800' :
-                          userData.role === 'teacher' ? 'bg-green-100 text-green-800' :
+                          userData.role === 'administrator' ? 'bg-blue-100 text-blue-800' :
+                          userData.role === 'cmd' ? 'bg-orange-100 text-orange-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>
                           {userData.role === 'superadmin' ? 'Super Admin' :
-                           userData.role === 'admin' ? 'Admin' :
-                           userData.role === 'teacher' ? 'Nauczyciel' : 'Użytkownik'}
+                           userData.role === 'administrator' ? 'Administrator' :
+                           userData.role === 'cmd' ? 'CMD' : 'Użytkownik'}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-center">
