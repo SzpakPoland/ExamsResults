@@ -9,13 +9,20 @@ const app = express();
 const PORT = 3001;
 
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://162.19.246.158:3000',
-    'https://egzaminy.mikolajhamerski.pl'
-  ],
-  credentials: true
+  origin: true,  // Tymczasowo zezwól na wszystkie domeny
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+// Handle preflight requests explicitly
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.sendStatus(200);
+});
+
 app.use(bodyParser.json());
 
 // Data files paths
@@ -607,11 +614,17 @@ app.use('*', (req, res) => {
     res.status(404).json({ error: 'Endpoint not found' });
 });
 
+// Add logging middleware to see requests
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log('Request body:', req.body);
+  }
+  next();
+});
+
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Server running on port ${PORT}`);
-    console.log(`📊 API endpoints available at http://162.19.246.158:${PORT}/api/`);
-    console.log(`💾 Data stored in: ${dataDir}`);
-    console.log(`🔐 Passwords are hashed with SHA-256`);
-    console.log(`👤 Test accounts: SzpakPL/admin123, administrator/admin123, CMD/admin123, użytkownik/admin123`);
-});
+    console.log(`📊 API endpoints available at http://0.0.0.0:${PORT}/api/`);
+    console.log(`💾 Data
