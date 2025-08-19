@@ -2,17 +2,21 @@ export interface ExamResult {
   id: number;
   nick: string;
   date?: string;
-  errors?: number;
-  bonusPoints?: number;
+  attempt?: number; // Changed from string to number
   totalPoints: number;
   maxPoints: number;
   percentage: number;
   passed: boolean;
   timestamp: string;
-  attempt?: string;
   examType: 'sprawdzanie' | 'ortografia' | 'dokumenty';
-  questionResults?: QuestionResult[];
+  errors?: number;
+  bonusPoints?: number;
   notes?: string;
+  questionResults?: Array<{
+    questionId: number;
+    pointsEarned: number;
+    passed: boolean;
+  }>;
 }
 
 export interface Question {
