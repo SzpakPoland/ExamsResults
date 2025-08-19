@@ -2,32 +2,28 @@
   {
     "id": 0,
     "username": "SzpakPL",
-<<<<<<< HEAD
-    "password": "68fb72c3b7f8575a47ca840cc61bd3b9d4dc80250e0ce5d8fee9dcbe9ee9cf11",
-=======
     "password": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
->>>>>>> 41828d93fb840d9316cf0b6d6f6edc01d1766572
     "role": "superadmin",
     "name": "SuperAdmin"
   },
   {
     "id": 1,
     "username": "administrator",
-    "password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+    "password": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
     "role": "administrator",
     "name": "test1"
   },
   {
     "id": 2,
     "username": "CMD",
-    "password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+    "password": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
     "role": "cmd",
     "name": "test2"
   },
   {
     "id": 3,
     "username": "użytkownik",
-    "password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+    "password": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
     "role": "user",
     "name": "test3"
   }
