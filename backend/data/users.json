@@ -4,27 +4,41 @@
     "username": "SzpakPL",
     "password": "68fb72c3b7f8575a47ca840cc61bd3b9d4dc80250e0ce5d8fee9dcbe9ee9cf11",
     "role": "superadmin",
-    "name": "SuperAdmin"
+    "name": "SzpakPL"
   },
   {
     "id": 1,
-    "username": "administrator",
-    "password": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
-    "role": "administrator",
-    "name": "test1"
+    "username": "Crystal",
+    "password": "7ea3919e7c5e2c3cd3c8109adc44353ea91e852e03b9ed2ce33183f448235a9d",
+    "role": "cmd",
+    "name": "Yung_Ad1sz"
   },
   {
     "id": 2,
-    "username": "CMD",
-    "password": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
-    "role": "cmd",
-    "name": "test2"
+    "username": "szymon_TA",
+    "password": "1ee69a491af567f7ce588401a9425eda612afbfce8f441b22445ccd828ab326e",
+    "role": "administrator",
+    "name": "Szymon"
   },
   {
     "id": 3,
-    "username": "użytkownik",
-    "password": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
-    "role": "user",
-    "name": "test3"
+    "username": "Kamlot",
+    "password": "3c18645f8ba513677f11d9c79a4714e2f959d8c2c4bd5cfdaa47e60dc4505915",
+    "role": "cmd",
+    "name": "Kamlot"
+  },
+  {
+    "id": 4,
+    "username": "Kowal",
+    "password": "6e77483c3ab6e0925c244afcd02407b3003dd74d1d11e0c4d62165b8a11832bd",
+    "role": "administrator",
+    "name": "Kowal"
+  },
+  {
+    "id": 5,
+    "username": "Mavik",
+    "password": "d437e4dc543fa3ed48666181c5ac8954ae9c56e571c5fa016a9e11bc1a7218a8",
+    "role": "administrator",
+    "name": "Hu55l3r"
   }
 ]
