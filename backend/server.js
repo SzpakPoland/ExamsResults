@@ -8,18 +8,19 @@ const crypto = require('crypto');
 const app = express();
 const PORT = 3001;
 
+// CORS configuration - allow all origins temporarily for debugging
 app.use(cors({
-  origin: true,  // Tymczasowo zezwól na wszystkie domeny
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
-// Handle preflight requests explicitly
+
+// Handle preflight requests
 app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   res.sendStatus(200);
 });
 
@@ -627,4 +628,5 @@ app.use((req, res, next) => {
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Server running on port ${PORT}`);
     console.log(`📊 API endpoints available at http://0.0.0.0:${PORT}/api/`);
-    console.log(`💾 Data
+    console.log(`💾 Data files located in: ${dataDir}`);
+});
