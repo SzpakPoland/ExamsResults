@@ -11,7 +11,9 @@ interface AuthContextType extends AuthState {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-const API_BASE_URL = 'http://localhost:3001/api'
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://your-vps-domain.com/api'  // Change to your VPS URL
+  : 'http://localhost:3001/api'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>({
@@ -80,6 +82,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
+      console.log('Attempting login to:', `${API_BASE_URL}/auth/login`);
+      
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
@@ -88,8 +92,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ username, password }),
       })
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (response.ok) {
         const data = await response.json()
+        console.log('Login successful:', data);
         const newAuthState = {
           isAuthenticated: true,
           user: data.user,
@@ -100,10 +108,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('auth-token', data.token)
         return true
       } else {
+        const errorData = await response.json();
+        console.error('Login failed:', errorData);
         return false
       }
     } catch (error) {
-      console.error('Login failed:', error)
+      console.error('Network error during login:', error)
       return false
     }
   }

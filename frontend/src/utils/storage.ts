@@ -1,6 +1,7 @@
 import type { ExamResult, Question, User, UserFormData } from '@/types'
 
-const API_BASE_URL = 'http://localhost:3001/api'
+// Change this to your VPS URL
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api'
 
 export const getQuestions = async (): Promise<Question[]> => {
   try {
@@ -222,5 +223,7 @@ export const changePassword = async (currentPassword: string, newPassword: strin
   } catch (error) {
     console.error('Error changing password:', error)
     throw error
+  }
+}
   }
 }

@@ -8,7 +8,14 @@ const crypto = require('crypto');
 const app = express();
 const PORT = 3001;
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://your-frontend-domain.com',  // Add your frontend domain
+    'https://your-vps-domain.com'        // Add your VPS domain
+  ],
+  credentials: true
+}));
 app.use(bodyParser.json());
 
 // Data files paths
@@ -522,47 +529,40 @@ app.delete('/api/users/:id', (req, res) => {
             if (filteredUsers.length === users.length) {
                 return res.status(404).json({ error: 'User not found' });
             }
-
-            if (writeUsers(filteredUsers)) {
-                res.json({ message: 'User deleted successfully' });
-            } else {
-                res.status(500).json({ error: 'Failed to delete user' });
-            }
-        } else {
             res.status(401).json({ error: 'Invalid token' });
-        }
-    } catch (error) {
+        }   if (writeUsers(filteredUsers)) {
+    } catch (error) {son({ message: 'User deleted successfully' });
         console.error('Error deleting user:', error);
-        res.status(500).json({ error: 'Failed to delete user' });
-    }
-});
-
+        res.status(500).json({ error: 'Failed to delete user' });ser' });
+    }       }
+});     } else {
+            res.status(401).json({ error: 'Invalid token' });
 // Change password endpoint - fixed
 app.post('/api/auth/change-password', (req, res) => {
-    try {
-        const authHeader = req.headers.authorization;
+    try {onsole.error('Error deleting user:', error);
+        const authHeader = req.headers.authorization;te user' });
         const token = authHeader?.split(' ')[1];
         
         if (!token) {
             return res.status(401).json({ error: 'No token provided' });
-        }
-
+        }'/api/auth/change-password', (req, res) => {
+    try {
         const { currentPassword, newPassword } = req.body;
-        
+        const token = authHeader?.split(' ')[1];
         if (!currentPassword || !newPassword) {
             return res.status(400).json({ error: 'Current password and new password are required' });
+        }   return res.status(401).json({ error: 'No token provided' });
         }
-
         const parts = token.split('_');
-        if (parts.length === 3) {
+        if (parts.length === 3) {newPassword } = req.body;
             const userId = parseInt(parts[1]);
-            const users = readUsers();
-            const userIndex = users.findIndex(u => u.id === userId);
+            const users = readUsers();ssword) {
+            const userIndex = users.findIndex(u => u.id === userId);nd new password are required' });
             
             if (userIndex === -1) {
                 return res.status(404).json({ error: 'User not found' });
-            }
-
+            }arts.length === 3) {
+            const userId = parseInt(parts[1]);
             const user = users[userIndex];
             const currentPasswordHash = hashPassword(currentPassword);
             
@@ -571,42 +571,49 @@ app.post('/api/auth/change-password', (req, res) => {
             }
 
             users[userIndex].password = hashPassword(newPassword);
-            
+            const currentPasswordHash = hashPassword(currentPassword);
             if (writeUsers(users)) {
                 res.json({ message: 'Password changed successfully' });
-            } else {
+            } else {rn res.status(400).json({ error: 'Current password is incorrect' });
                 res.status(500).json({ error: 'Failed to update password' });
             }
-        } else {
+        } else {s[userIndex].password = hashPassword(newPassword);
             res.status(401).json({ error: 'Invalid token' });
-        }
-    } catch (error) {
+        }   if (writeUsers(users)) {
+    } catch (error) {son({ message: 'Password changed successfully' });
         console.error('Error changing password:', error);
-        res.status(500).json({ error: 'Failed to change password' });
-    }
-});
-
+        res.status(500).json({ error: 'Failed to change password' });ord' });
+    }       }
+});     } else {
+            res.status(401).json({ error: 'Invalid token' });
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: 'OK', 
+    res.json({ .error('Error changing password:', error);
+        status: 'OK', ).json({ error: 'Failed to change password' });
         timestamp: new Date().toISOString(),
         version: '1.0.0'
     });
-});
-
+});Health check endpoint
+app.get('/api/health', (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    console.error(err.stack);.toISOString(),
     res.status(500).json({ error: 'Something went wrong!' });
+}); });
 });
-
 // 404 handler
 app.use('*', (req, res) => {
     res.status(404).json({ error: 'Endpoint not found' });
-});
-
+}); console.error(err.stack);
+    res.status(500).json({ error: 'Something went wrong!' });
 // Start server
+app.listen(PORT, '0.0.0.0', () => {  // Add '0.0.0.0' to listen on all interfaces
+    console.log(`✅ Server running on port ${PORT}`);
+    console.log(`📊 API endpoints available at http://localhost:${PORT}/api/`);
+    console.log(`💾 Data stored in: ${dataDir}`);ound' });
+    console.log(`🔐 Passwords are hashed with SHA-256`);
+    console.log(`👤 Test accounts: SzpakPL/admin123, administrator/admin123, CMD/admin123, użytkownik/admin123`);
+});Start server
 app.listen(PORT, () => {
     console.log(`✅ Server running on port ${PORT}`);
     console.log(`📊 API endpoints available at http://localhost:${PORT}/api/`);
