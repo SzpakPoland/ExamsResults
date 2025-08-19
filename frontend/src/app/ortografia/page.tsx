@@ -71,7 +71,7 @@ export default function OrtografiaPage() {
 
   const resetForm = () => {
     setResult(null)
-    setFormData({ nick: '', attempt: 'Pierwsze', percentage: 0, notes: '' })
+    setFormData({ nick: '', attempt: 1, percentage: 0, date: '', notes: '' })
   }
 
   if (pageLoading) {
