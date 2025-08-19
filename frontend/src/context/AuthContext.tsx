@@ -11,7 +11,7 @@ interface AuthContextType extends AuthState {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://162.19.246.158:3001/api'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>({
@@ -23,13 +23,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Check for stored token on app start
-    if (typeof window !== 'undefined') {
-      const storedToken = localStorage.getItem('auth-token')
-      if (storedToken) {
-        verifyToken(storedToken)
-      } else {
-        setIsLoading(false)
-      }
+    const storedToken = localStorage.getItem('auth-token')
+    if (storedToken) {
+      verifyToken(storedToken)
     } else {
       setIsLoading(false)
     }
@@ -38,11 +34,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const verifyToken = async (token: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/verify`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
+        body: JSON.stringify({ token }),
       })
 
       if (response.ok) {
@@ -54,9 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         })
       } else {
         // Invalid token, remove it
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('auth-token')
-        }
+        localStorage.removeItem('auth-token')
         setAuthState({
           isAuthenticated: false,
           user: null,
@@ -65,9 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error('Token verification failed:', error)
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth-token')
-      }
+      localStorage.removeItem('auth-token')
       setAuthState({
         isAuthenticated: false,
         user: null,
@@ -80,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
-      console.log('Attempting login to:', `${API_BASE_URL}/auth/login`);
+      console.log('Attempting login to:', `${API_BASE_URL}/auth/login`)
       
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
@@ -90,12 +82,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ username, password }),
       })
 
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
+      console.log('Response status:', response.status)
+      console.log('Response ok:', response.ok)
 
       if (response.ok) {
         const data = await response.json()
-        console.log('Login successful:', data);
+        console.log('Login successful:', data)
         const newAuthState = {
           isAuthenticated: true,
           user: data.user,
@@ -106,8 +98,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('auth-token', data.token)
         return true
       } else {
-        const errorData = await response.json();
-        console.error('Login failed:', errorData);
+        const errorData = await response.json()
+        console.error('Login failed:', errorData)
         return false
       }
     } catch (error) {
@@ -117,9 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth-token')
-    }
+    localStorage.removeItem('auth-token')
     setAuthState({
       isAuthenticated: false,
       user: null,
@@ -144,7 +134,5 @@ export function useAuth() {
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider')
   }
-  return context
-}
   return context
 }
