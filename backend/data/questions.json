@@ -1,77 +1,112 @@
 [
   {
     "id": 1,
-    "text": "Jakie są podstawowe zasady bezpieczeństwa w sieci?",
-    "maxPoints": 2
+    "text": "Weryfikacja osoby",
+    "maxPoints": 1
   },
   {
     "id": 2,
-    "text": "Wymień trzy najważniejsze protokoły sieciowe.",
-    "maxPoints": 3
+    "text": "Sprawdzenie skryptów oraz bindów pod gui",
+    "maxPoints": 1
   },
   {
     "id": 3,
-    "text": "Co to jest adres IP i jak się go konfiguruje?",
-    "maxPoints": 2
+    "text": "Sprawdzenie przypisanych klawiszy",
+    "maxPoints": 1
   },
   {
     "id": 4,
-    "text": "Jakie są różnice między TCP a UDP?",
-    "maxPoints": 2
+    "text": "Sprawdzenie statystyk",
+    "maxPoints": 1
   },
   {
     "id": 5,
-    "text": "Jak działa system DNS?",
-    "maxPoints": 2
+    "text": "Sprawdzenie paczek tekstur",
+    "maxPoints": 1
   },
   {
     "id": 6,
-    "text": "Co to jest firewall i jakie są jego funkcje?",
-    "maxPoints": 2
+    "text": "Przegląd folderów Minecrafta?",
+    "maxPoints": 1
   },
   {
     "id": 7,
-    "text": "Wymień podstawowe polecenia w systemie Windows.",
-    "maxPoints": 3
+    "text": "Analiza logów",
+    "maxPoints": 1
   },
   {
     "id": 8,
-    "text": "Co to jest Active Directory?",
-    "maxPoints": 2
+    "text": "Sprawdzenie zrzutów ekranu",
+    "maxPoints": 1
   },
   {
     "id": 9,
-    "text": "Jakie są rodzaje kopii zapasowych?",
-    "maxPoints": 2
+    "text": "Crash reports",
+    "maxPoints": 1
   },
   {
     "id": 10,
-    "text": "Jak skonfigurować serwer DHCP?",
-    "maxPoints": 3
+    "text": "Przeszukiwanie systemu (.jar, .rar itp.)",
+    "maxPoints": 1
   },
   {
     "id": 11,
-    "text": "Co to jest VPN i jak działa?",
-    "maxPoints": 2
+    "text": "Sprawdzanie poprzez shell:recent",
+    "maxPoints": 1
   },
   {
     "id": 12,
-    "text": "Jakie są podstawowe zasady tworzenia haseł?",
-    "maxPoints": 2
+    "text": "Sprawdzanie plików pod kątem grima (comfig)",
+    "maxPoints": 1
   },
   {
     "id": 13,
-    "text": "Co to jest malware i jak się przed nim chronić?",
-    "maxPoints": 2
+    "text": "Sprawdzanie „crashes”",
+    "maxPoints": 1
   },
   {
     "id": 14,
-    "text": "Jak działa protokół HTTP/HTTPS?",
-    "maxPoints": 2
+    "text": "Sprawdzanie „searches”",
+    "maxPoints": 1
   },
   {
     "id": 15,
-    "text": "Co to jest load balancer?",
+    "text": "Sprawdzanie „prefetch”",
+    "maxPoints": 1
+  },
+   {
+    "id": 16,
+    "text": "Sprawdzanie przez wiersz poleceń:",
+    "maxPoints": 1
+  },
+  {
+    "id": 17,
+    "text": "Szybki dostęp",
+    "maxPoints": 1
+  },
+    {
+    "id": 18,
+    "text": "Kosz",
+    "maxPoints": 1
+  },
+    {
+    "id": 19,
+    "text": "Pulpit",
+    "maxPoints": 1
+  },
+    {
+    "id": 20,
+    "text": "Dodatkowe foldery",
+    "maxPoints": 1
+  },
+  {
+    "id": 21,
+    "text": "Wykrycie cheatów",
+    "maxPoints": 4
+  },
+  {
+    "id": 22,
+    "text": "Komunikatywność",
     "maxPoints": 2
-  }
+  },
 ]
