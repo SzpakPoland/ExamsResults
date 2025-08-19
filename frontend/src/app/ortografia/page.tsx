@@ -11,8 +11,9 @@ import type { ExamResult, OrtografiaFormData } from '@/types'
 export default function OrtografiaPage() {
   const [formData, setFormData] = useState<OrtografiaFormData>({
     nick: '',
-    attempt: 'Pierwsze',
+    attempt: 1,
     percentage: 0,
+    date: '',
     notes: ''
   })
   const [result, setResult] = useState<ExamResult | null>(null)

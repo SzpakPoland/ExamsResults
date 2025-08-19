@@ -40,7 +40,7 @@ export interface OrtografiaFormData {
   attempt: number;
   percentage: number;
   date: string;
-  notes: string;
+  notes?: string;
 }
 
 export interface DokumentyFormData {
