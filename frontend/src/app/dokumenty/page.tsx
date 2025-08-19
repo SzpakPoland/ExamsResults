@@ -13,7 +13,9 @@ export default function DokumentyPage() {
     nick: '',
     date: '',
     maxPoints: 0,
-    achievedPoints: 0
+    achievedPoints: 0,
+    bonusPoints: 0,
+    notes: ''
   })
   const [result, setResult] = useState<ExamResult | null>(null)
   const [loading, setLoading] = useState(false)
@@ -26,11 +28,11 @@ export default function DokumentyPage() {
     return () => clearTimeout(timer)
   }, [])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'maxPoints' || name === 'achievedPoints' ? parseInt(value) || 0 : value
+      [name]: name === 'maxPoints' || name === 'achievedPoints' || name === 'bonusPoints' ? parseInt(value) || 0 : value
     }))
   }
 
@@ -39,8 +41,8 @@ export default function DokumentyPage() {
     setLoading(true)
     
     try {
-      const maxPointsWithBonus = formData.maxPoints + formData.bonusPoints // Dodaj bonusy do puli wszystkich punktów
-      const totalPointsWithBonus = formData.achievedPoints + formData.bonusPoints // Dodaj bonusy do zdobytych punktów
+      const maxPointsWithBonus = formData.maxPoints + (formData.bonusPoints || 0)
+      const totalPointsWithBonus = formData.achievedPoints + (formData.bonusPoints || 0)
       const percentage = maxPointsWithBonus > 0 ? (totalPointsWithBonus / maxPointsWithBonus) * 100 : 0
       const passed = percentage >= 75
 
@@ -48,14 +50,14 @@ export default function DokumentyPage() {
         id: Date.now(),
         nick: formData.nick,
         date: formData.date,
-        bonusPoints: formData.bonusPoints,
+        bonusPoints: formData.bonusPoints || 0,
         totalPoints: totalPointsWithBonus,
         maxPoints: maxPointsWithBonus,
         percentage: Math.round(percentage * 100) / 100,
         passed,
         timestamp: new Date().toISOString(),
         examType: 'dokumenty',
-        notes: formData.notes
+        notes: formData.notes || ''
       }
 
       await saveResult(newResult)
@@ -70,7 +72,7 @@ export default function DokumentyPage() {
 
   const resetForm = () => {
     setResult(null)
-    setFormData({ nick: '', date: '', maxPoints: 0, achievedPoints: 0 })
+    setFormData({ nick: '', date: '', maxPoints: 0, achievedPoints: 0, bonusPoints: 0, notes: '' })
   }
 
   const currentPercentage = formData.maxPoints > 0 ? Math.round((formData.achievedPoints / formData.maxPoints) * 100) : 0
@@ -231,12 +233,28 @@ export default function DokumentyPage() {
 
             <div>
               <label className="label">
+                <Trophy className="w-4 h-4 inline mr-2" />
+                Punkty dodatkowe
+              </label>
+              <input
+                type="number"
+                name="bonusPoints"
+                min="0"
+                value={formData.bonusPoints || 0}
+                onChange={handleInputChange}
+                className="input text-lg font-bold text-center"
+                placeholder="0"
+              />
+            </div>
+
+            <div>
+              <label className="label">
                 <MessageSquare className="w-4 h-4 inline mr-2" />
                 Notatki
               </label>
               <textarea
                 name="notes"
-                value={formData.notes}
+                value={formData.notes || ''}
                 onChange={handleInputChange}
                 className="input min-h-[80px] resize-none"
                 placeholder="Dodatkowe notatki..."

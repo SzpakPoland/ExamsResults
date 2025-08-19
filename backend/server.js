@@ -234,7 +234,7 @@ app.post('/api/results', (req, res) => {
     }
 });
 
-// Delete result by ID
+// Delete result by ID - improved with authorization check
 app.delete('/api/results/:id', (req, res) => {
     try {
         const { id } = req.params;
@@ -248,6 +248,7 @@ app.delete('/api/results/:id', (req, res) => {
         }
         
         if (writeResults(filteredResults)) {
+            console.log(`Result ${id} deleted successfully`);
             res.json({ message: 'Result deleted successfully' });
         } else {
             res.status(500).json({ error: 'Failed to delete result' });

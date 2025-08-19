@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { BarChart3, Calendar, User, CheckCircle, XCircle, RefreshCw, Eye, X, ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { BarChart3, Calendar, User, CheckCircle, XCircle, RefreshCw, Eye, X, ChevronLeft, ChevronRight, Search, Trash2 } from 'lucide-react'
 import Layout from '@/components/ui/Layout'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
-import { getResults, getResultsByType } from '@/utils/storage'
+import { getResults, getResultsByType, deleteResult } from '@/utils/storage'
 import type { ExamResult } from '@/types'
 
 export default function ResultsPage() {
@@ -16,6 +16,7 @@ export default function ResultsPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
   const [searchTerm, setSearchTerm] = useState('')
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null)
 
   useEffect(() => {
     loadResults()
@@ -34,6 +35,22 @@ export default function ResultsPage() {
       setTimeout(() => {
         setLoading(false)
       }, 800)
+    }
+  }
+
+  const handleDeleteResult = async (id: number) => {
+    if (deleteConfirm === id) {
+      try {
+        await deleteResult(id)
+        await loadResults() // Refresh results
+        setDeleteConfirm(null)
+      } catch (error) {
+        console.error('Error deleting result:', error)
+      }
+    } else {
+      setDeleteConfirm(id)
+      // Auto-cancel after 3 seconds
+      setTimeout(() => setDeleteConfirm(null), 3000)
     }
   }
 
@@ -529,13 +546,28 @@ export default function ResultsPage() {
                           </span>
                         </td>
                         <td className="py-4 px-6 text-center">
-                          <button
-                            onClick={() => setSelectedResult(result)}
-                            className="inline-flex items-center px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg text-xs font-medium transition-colors duration-200"
-                          >
-                            <Eye className="w-3 h-3 mr-1" />
-                            Szczegóły
-                          </button>
+                          <div className="flex items-center justify-center space-x-2">
+                            <button
+                              onClick={() => setSelectedResult(result)}
+                              className="inline-flex items-center px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg text-xs font-medium transition-colors duration-200"
+                            >
+                              <Eye className="w-3 h-3 mr-1" />
+                              Szczegóły
+                            </button>
+                            
+                            <button
+                              onClick={() => handleDeleteResult(result.id)}
+                              className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium transition-colors duration-200 ${
+                                deleteConfirm === result.id
+                                  ? 'bg-red-600 hover:bg-red-700 text-white'
+                                  : 'bg-red-100 hover:bg-red-200 text-red-800'
+                              }`}
+                              title={deleteConfirm === result.id ? 'Kliknij ponownie aby potwierdzić' : 'Usuń wynik'}
+                            >
+                              <Trash2 className="w-3 h-3 mr-1" />
+                              {deleteConfirm === result.id ? 'Potwierdź' : 'Usuń'}
+                            </button>
+                          </div>
                         </td>
                       </motion.tr>
                     ))}
