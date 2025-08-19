@@ -11,9 +11,7 @@ interface AuthContextType extends AuthState {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://your-vps-domain.com/api'  // Change to your VPS URL
-  : 'http://localhost:3001/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>({
@@ -146,5 +144,7 @@ export function useAuth() {
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider')
   }
+  return context
+}
   return context
 }

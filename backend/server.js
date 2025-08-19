@@ -11,8 +11,8 @@ const PORT = 3001;
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://your-frontend-domain.com',  // Add your frontend domain
-    'https://your-vps-domain.com'        // Add your VPS domain
+    'http://162.19.246.158:3000',
+    'https://egzaminy.mikolajhamerski.pl'
   ],
   credentials: true
 }));
@@ -607,16 +607,9 @@ app.use('*', (req, res) => {
 }); console.error(err.stack);
     res.status(500).json({ error: 'Something went wrong!' });
 // Start server
-app.listen(PORT, '0.0.0.0', () => {  // Add '0.0.0.0' to listen on all interfaces
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Server running on port ${PORT}`);
-    console.log(`📊 API endpoints available at http://localhost:${PORT}/api/`);
-    console.log(`💾 Data stored in: ${dataDir}`);ound' });
-    console.log(`🔐 Passwords are hashed with SHA-256`);
-    console.log(`👤 Test accounts: SzpakPL/admin123, administrator/admin123, CMD/admin123, użytkownik/admin123`);
-});Start server
-app.listen(PORT, () => {
-    console.log(`✅ Server running on port ${PORT}`);
-    console.log(`📊 API endpoints available at http://localhost:${PORT}/api/`);
+    console.log(`📊 API endpoints available at http://162.19.246.158:${PORT}/api/`);
     console.log(`💾 Data stored in: ${dataDir}`);
     console.log(`🔐 Passwords are hashed with SHA-256`);
     console.log(`👤 Test accounts: SzpakPL/admin123, administrator/admin123, CMD/admin123, użytkownik/admin123`);
