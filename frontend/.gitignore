@@ -38,3 +38,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local env files
+.env*.local
+
+# Keep .env.production for VPS deployment - comment out if you want to ignore it
+# .env.production
