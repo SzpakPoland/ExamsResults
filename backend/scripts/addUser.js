@@ -58,8 +58,3 @@ try {
     console.error('❌ Błąd podczas dodawania użytkownika:', error.message);
     process.exit(1);
 }
-    
-} catch (error) {
-    console.error('❌ Błąd podczas dodawania użytkownika:', error.message);
-    process.exit(1);
-}

@@ -135,3 +135,20 @@
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #0284c7, #0369a1);
 }
+
+/* Force navbar refresh */
+nav {
+  min-height: 64px !important;
+}
+
+.nav-container {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.nav-center {
+  flex: 1 !important;
+  display: flex !important;
+  justify-content: center !important;
+}
