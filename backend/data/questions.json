@@ -34,78 +34,93 @@
     "text": "Analiza logów",
     "maxPoints": 1
   },
-  {
+    {
     "id": 8,
-    "text": "Sprawdzenie zrzutów ekranu",
+    "text": "Przeglądnięcie modów",
     "maxPoints": 1
   },
-  {
+    {
     "id": 9,
-    "text": "Crash reports",
+    "text": "Otworzenie modów winrarem",
     "maxPoints": 1
   },
-  {
+    {
     "id": 10,
-    "text": "Przeszukiwanie systemu (.jar, .rar itp.)",
+    "text": "Sprawdzenie wagi modów",
     "maxPoints": 1
   },
   {
     "id": 11,
-    "text": "Sprawdzanie poprzez shell:recent",
+    "text": "Sprawdzenie zrzutów ekranu",
     "maxPoints": 1
   },
   {
     "id": 12,
-    "text": "Sprawdzanie plików pod kątem grima (comfig)",
+    "text": "Crash reports",
     "maxPoints": 1
   },
   {
     "id": 13,
-    "text": "Sprawdzanie „crashes”",
+    "text": "Przeszukiwanie systemu (.jar, .rar itp.)",
     "maxPoints": 1
   },
   {
     "id": 14,
-    "text": "Sprawdzanie „searches”",
+    "text": "Sprawdzanie poprzez shell:recent",
     "maxPoints": 1
   },
   {
     "id": 15,
-    "text": "Sprawdzanie „prefetch”",
+    "text": "Sprawdzanie plików pod kątem grima (comfig)",
     "maxPoints": 1
   },
-   {
+  {
     "id": 16,
-    "text": "Sprawdzanie przez wiersz poleceń:",
+    "text": "Sprawdzanie „crashes”",
     "maxPoints": 1
   },
   {
     "id": 17,
+    "text": "Sprawdzanie „searches”",
+    "maxPoints": 1
+  },
+  {
+    "id": 18,
+    "text": "Sprawdzanie „prefetch”",
+    "maxPoints": 1
+  },
+   {
+    "id": 19,
+    "text": "Sprawdzanie przez wiersz poleceń:",
+    "maxPoints": 1
+  },
+  {
+    "id": 20,
     "text": "Szybki dostęp",
     "maxPoints": 1
   },
     {
-    "id": 18,
+    "id": 21,
     "text": "Kosz",
     "maxPoints": 1
   },
     {
-    "id": 19,
+    "id": 22,
     "text": "Pulpit",
     "maxPoints": 1
   },
     {
-    "id": 20,
+    "id": 23,
     "text": "Dodatkowe foldery",
     "maxPoints": 1
   },
   {
-    "id": 21,
+    "id": 24,
     "text": "Wykrycie cheatów",
     "maxPoints": 4
   },
   {
-    "id": 22,
+    "id": 25,
     "text": "Komunikatywność",
     "maxPoints": 2
   }
