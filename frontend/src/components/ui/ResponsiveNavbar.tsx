@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { Menu, X, Home, BarChart3, Users, FileText, LogOut } from 'lucide-react';
+import { Menu, X, Home, BarChart3, Users, FileText, LogOut, User, Key } from 'lucide-react';
 
 const ResponsiveNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,12 +12,12 @@ const ResponsiveNavbar = () => {
   const closeMenu = () => setIsOpen(false);
 
   const navigationItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
+    { name: 'Strona główna', href: '/', icon: Home },
     { name: 'Sprawdzanie', href: '/sprawdzanie', icon: FileText },
     { name: 'Ortografia', href: '/ortografia', icon: FileText },
     { name: 'Dokumenty', href: '/dokumenty', icon: FileText },
     { name: 'Wyniki', href: '/results', icon: BarChart3 },
-    ...(user?.role === 'superadmin' ? [{ name: 'Użytkownicy', href: '/users', icon: Users }] : []),
+    ...(user?.role === 'superadmin' ? [{ name: 'Panel Admina', href: '/admin', icon: Users }] : []),
   ];
 
   return (
@@ -26,7 +26,7 @@ const ResponsiveNavbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link href="/dashboard" className="text-white text-xl font-bold hover:text-blue-200 transition-colors">
+            <Link href="/" className="text-white text-xl font-bold hover:text-blue-200 transition-colors">
               ExamsResults
             </Link>
           </div>
@@ -47,14 +47,34 @@ const ResponsiveNavbar = () => {
                   </Link>
                 );
               })}
-              <button
-                onClick={logout}
-                className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
-              >
-                <LogOut className="w-4 h-4" />
-                Wyloguj
-              </button>
             </div>
+          </div>
+
+          {/* Desktop User Info & Actions */}
+          <div className="hidden md:flex items-center space-x-4">
+            {user && (
+              <div className="flex items-center space-x-3 bg-blue-700/50 px-3 py-2 rounded-lg">
+                <User className="w-5 h-5 text-blue-200" />
+                <div className="text-blue-100">
+                  <div className="text-sm font-medium">{user.name}</div>
+                  <div className="text-xs text-blue-300">{user.role}</div>
+                </div>
+              </div>
+            )}
+            <Link
+              href="/change-password"
+              className="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+            >
+              <Key className="w-4 h-4" />
+              Zmień hasło
+            </Link>
+            <button
+              onClick={logout}
+              className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Wyloguj
+            </button>
           </div>
 
           {/* Mobile menu button */}
@@ -78,6 +98,19 @@ const ResponsiveNavbar = () => {
           isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
         }`}>
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-blue-900/50 rounded-lg mt-2">
+            {/* Mobile User Info */}
+            {user && (
+              <div className="bg-blue-700/50 p-3 rounded-lg mb-3">
+                <div className="flex items-center space-x-3 text-blue-100">
+                  <User className="w-6 h-6 text-blue-200" />
+                  <div>
+                    <div className="text-base font-medium">{user.name}</div>
+                    <div className="text-sm text-blue-300">{user.role}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             {navigationItems.map((item) => {
               const IconComponent = item.icon;
               return (
@@ -92,6 +125,16 @@ const ResponsiveNavbar = () => {
                 </Link>
               );
             })}
+            
+            <Link
+              href="/change-password"
+              onClick={closeMenu}
+              className="text-amber-100 bg-amber-600 hover:bg-amber-700 block px-3 py-2 rounded-md text-base font-medium transition-colors flex items-center gap-3"
+            >
+              <Key className="w-5 h-5" />
+              Zmień hasło
+            </Link>
+            
             <button
               onClick={() => {
                 logout();
