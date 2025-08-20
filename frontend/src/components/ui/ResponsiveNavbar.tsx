@@ -95,9 +95,9 @@ const ResponsiveNavbar = () => {
 
         {/* Mobile Navigation Menu */}
         <div className={`md:hidden transition-all duration-300 ease-in-out ${
-          isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
+          isOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
         }`}>
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-blue-900/50 rounded-lg mt-2">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-blue-900/50 rounded-lg mt-2 mb-2">
             {/* Mobile User Info */}
             {user && (
               <div className="bg-blue-700/50 p-3 rounded-lg mb-3">
@@ -111,6 +111,7 @@ const ResponsiveNavbar = () => {
               </div>
             )}
             
+            {/* Navigation Links */}
             {navigationItems.map((item) => {
               const IconComponent = item.icon;
               return (
@@ -126,10 +127,14 @@ const ResponsiveNavbar = () => {
               );
             })}
             
+            {/* Divider */}
+            <div className="border-t border-blue-700 my-2"></div>
+            
+            {/* Action Buttons */}
             <Link
               href="/change-password"
               onClick={closeMenu}
-              className="text-amber-100 bg-amber-600 hover:bg-amber-700 block px-3 py-2 rounded-md text-base font-medium transition-colors flex items-center gap-3"
+              className="text-amber-100 bg-amber-600 hover:bg-amber-700 block px-3 py-2 rounded-md text-base font-medium transition-colors flex items-center gap-3 w-full"
             >
               <Key className="w-5 h-5" />
               Zmień hasło
@@ -140,7 +145,7 @@ const ResponsiveNavbar = () => {
                 logout();
                 closeMenu();
               }}
-              className="w-full text-left bg-red-600 hover:bg-red-700 text-white block px-3 py-2 rounded-md text-base font-medium transition-colors flex items-center gap-3"
+              className="w-full text-left bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-base font-medium transition-colors flex items-center gap-3 mt-1"
             >
               <LogOut className="w-5 h-5" />
               Wyloguj
