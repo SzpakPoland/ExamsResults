@@ -145,18 +145,16 @@ export default function Navigation() {
                       </div>
                       
                       <div className="p-1">
-                        <button
-                          onClick={() => {
-                            setShowPasswordModal(true)
-                            setIsUserMenuOpen(false)
-                          }}
-                          className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 rounded-lg transition-all duration-200 hover:scale-105 group"
+                        <a
+                          href="/account"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 rounded-lg transition-all duration-200 hover:scale-105 group block"
                         >
                           <div className="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                            <Key className="w-3 h-3 text-blue-600" />
+                            <User className="w-3 h-3 text-blue-600" />
                           </div>
-                          <span className="text-xs font-medium">Zmień hasło</span>
-                        </button>
+                          <span className="text-xs font-medium">Zarządzaj kontem</span>
+                        </a>
                       </div>
                     </div>
                   )}

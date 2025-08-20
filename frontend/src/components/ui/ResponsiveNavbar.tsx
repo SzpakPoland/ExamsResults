@@ -62,11 +62,11 @@ const ResponsiveNavbar = () => {
               </div>
             )}
             <Link
-              href="/change-password"
+              href="/account"
               className="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
             >
               <Key className="w-4 h-4" />
-              Zmień hasło
+              Zarządzaj kontem
             </Link>
             <button
               onClick={logout}
@@ -132,12 +132,12 @@ const ResponsiveNavbar = () => {
             
             {/* Action Buttons */}
             <Link
-              href="/change-password"
+              href="/account"
               onClick={closeMenu}
               className="text-amber-100 bg-amber-600 hover:bg-amber-700 block px-3 py-2 rounded-md text-base font-medium transition-colors flex items-center gap-3 w-full"
             >
               <Key className="w-5 h-5" />
-              Zmień hasło
+              Zarządzaj kontem
             </Link>
             
             <button
