@@ -50,10 +50,10 @@ export default function Layout({ children, title }: LayoutProps) {
 
   return (
     <TestConductorContext.Provider value={conductorInfo}>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col">
         <ResponsiveNavbar />
         
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 py-8 flex-1 flex flex-col">
           {title && (
             <motion.div 
               className="text-center mb-8"
@@ -67,6 +67,7 @@ export default function Layout({ children, title }: LayoutProps) {
           )}
           
           <motion.div
+            className="flex-1 flex flex-col"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}

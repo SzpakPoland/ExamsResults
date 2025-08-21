@@ -27,7 +27,7 @@ const ResponsiveNavbar = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="text-white text-xl font-bold hover:text-blue-200 transition-colors">
-              ExamsResults
+              Panel wyników
             </Link>
           </div>
 

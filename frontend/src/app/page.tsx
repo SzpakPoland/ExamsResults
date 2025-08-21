@@ -145,37 +145,43 @@ export default function HomePage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 1.6 }}
       >
-        <h2 className="text-4xl font-bold gradient-text mb-4">
-          Funkcje systemu
-        </h2>
-        <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
-          Zaawansowane funkcje zaprojektowane z myślą o efektywności
-        </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              className="card-glass p-8 group hover:scale-105 transition-all duration-300 border border-white/30"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.8 + index * 0.2 }}
-            >
-              <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg`}>
-                <feature.icon className="w-8 h-8 text-white" />
-              </div>
-              
-              <h3 className="text-xl font-bold text-gray-800 mb-4">
-                {feature.title}
-              </h3>
-              
-              <p className="text-gray-600 leading-relaxed">
-                {feature.description}
-              </p>
-            </motion.div>
-          ))}
-        </div>
+       
       </motion.div>
+
+      
+      {/* Footer */}
+      <motion.footer 
+        className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] mt-auto pt-8 pb-0 border-t border-gray-200/50 shadow-lg"
+        style={{ backgroundColor: '#e6e8ebff' }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
+        <div className="container mx-auto px-4 pb-6">
+          
+          <div className="flex flex-col md:flex-row items-center justify-center space-y-3 md:space-y-0 md:space-x-8 py-3 border-t border-gray-100">
+            <div className="flex items-center space-x-6 text-sm text-gray-500">
+              <span className="flex items-center">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                Wyniki w czasie rzeczywistym
+              </span>
+              <span className="flex items-center">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                Automatyczne obliczenia
+              </span>
+              <span className="flex items-center">
+                <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                Bezpieczne przechowywanie
+              </span>
+            </div>
+          </div>
+          
+          <div className="text-center text-black-400 text-sm">
+            <p className="mb-1">© 2025 Mikołaj Hamerski. Wszystkie prawa zastrzeżone.</p>
+            <p>Wersja 2.0.0 - Hybrid SQLite + JSON Storage</p>
+          </div>
+        </div>
+      </motion.footer>
     </Layout>
   )
 }

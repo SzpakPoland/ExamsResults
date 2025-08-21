@@ -286,6 +286,41 @@ export default function OrtografiaPage() {
           </form>
         </div>
       </motion.div>
+
+      
+      {/* Footer */}
+      <motion.footer 
+        className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] mt-auto pt-8 pb-0 border-t border-gray-200/50 shadow-lg"
+        style={{ backgroundColor: '#e6e8ebff' }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
+        <div className="container mx-auto px-4 pb-6">
+          
+          <div className="flex flex-col md:flex-row items-center justify-center space-y-3 md:space-y-0 md:space-x-8 py-3 border-t border-gray-100">
+            <div className="flex items-center space-x-6 text-sm text-gray-500">
+              <span className="flex items-center">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                Wyniki w czasie rzeczywistym
+              </span>
+              <span className="flex items-center">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                Automatyczne obliczenia
+              </span>
+              <span className="flex items-center">
+                <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                Bezpieczne przechowywanie
+              </span>
+            </div>
+          </div>
+          
+          <div className="text-center text-black-400 text-sm">
+            <p className="mb-1">© 2025 Mikołaj Hamerski. Wszystkie prawa zastrzeżone.</p>
+            <p>Wersja 2.0.0 - Hybrid SQLite + JSON Storage</p>
+          </div>
+        </div>
+      </motion.footer>
     </Layout>
   )
 }
