@@ -18,37 +18,63 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <LoadingSpinner message="Sprawdzanie autoryzacji..." />
   }
 
-  if (!isAuthenticated) {
-    return <LoginForm />
+  // Check role-based access
+  if (isAuthenticated && user) {
+    // Super admin has access to everything
+    if (user.role === 'superadmin') {
+      return <>{children}</>
+    }
+
+    // Administrator has access to most things except admin panel
+    if (user.role === 'administrator') {
+      if (pathname === '/admin') {
+        return (
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+              <h2 className="text-2xl font-bold text-red-600 mb-4">Brak dostępu</h2>
+              <p className="text-gray-600">Tylko Super Administrator ma dostęp do panelu administracyjnego.</p>
+            </div>
+          </div>
+        )
+      }
+      return <>{children}</>
+    }
+
+    // CMD role has access only to ortografia
+    if (user.role === 'cmd') {
+      const allowedPaths = ['/', '/ortografia', '/results', '/account']
+      if (!allowedPaths.includes(pathname)) {
+        return (
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+              <h2 className="text-2xl font-bold text-orange-600 mb-4">Ograniczony dostęp</h2>
+              <p className="text-gray-600">Konta CMD mają dostęp tylko do testu ortografii i wyników.</p>
+            </div>
+          </div>
+        )
+      }
+      return <>{children}</>
+    }
+
+    // Regular user has access to all exam types but not admin
+    if (user.role === 'user') {
+      if (pathname === '/admin') {
+        return (
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+              <h2 className="text-2xl font-bold text-red-600 mb-4">Brak dostępu</h2>
+              <p className="text-gray-600">Nie masz uprawnień do panelu administracyjnego.</p>
+            </div>
+          </div>
+        )
+      }
+      return <>{children}</>
+    }
   }
 
-  // Check role-based access
-  if (user) {
-    // CMD can only access ortografia
-    if (user.role === 'cmd' && pathname !== '/ortografia' && pathname !== '/' && pathname !== '/results') {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-red-600 mb-4">Brak uprawnień</h2>
-            <p className="text-gray-600 mb-4">Twoje konto CMD ma dostęp tylko do testu ortografii.</p>
-            <a href="/ortografia" className="btn btn-primary">Przejdź do ortografii</a>
-          </div>
-        </div>
-      )
-    }
-
-    // Administrator and superadmin have full access
-    // Regular users have access to all exam types but not admin panel
-    if (user.role === 'user' && pathname === '/admin') {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-red-600 mb-4">Brak uprawnień</h2>
-            <p className="text-gray-600">Nie masz dostępu do panelu administracyjnego.</p>
-          </div>
-        </div>
-      )
-    }
+  // Not authenticated - show login
+  if (!isAuthenticated) {
+    return <LoginForm />
   }
 
   return <>{children}</>
