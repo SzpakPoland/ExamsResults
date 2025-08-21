@@ -3,13 +3,14 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
-const { Database, hashPassword } = require('./database');
+const crypto = require('crypto');
+const { ResultsDatabase } = require('./database');
 
 const app = express();
 const PORT = 3001;
 
-// Initialize database
-const db = new Database();
+// Initialize results database
+const resultsDb = new ResultsDatabase();
 
 // CORS configuration
 app.use(cors({
@@ -28,11 +29,118 @@ app.options('*', (req, res) => {
 
 app.use(bodyParser.json());
 
-// Ensure data directory exists
+// Data files paths (dla users i questions)
 const dataDir = path.join(__dirname, 'data');
+const questionsFile = path.join(dataDir, 'questions.json');
+const usersFile = path.join(dataDir, 'users.json');
+
+// Ensure directories exist
 if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
 }
+
+// Hash password function
+const hashPassword = (password) => {
+    return crypto.createHash('sha256').update(password).digest('hex');
+};
+
+// Initialize data files
+const initDataFile = (filePath, defaultData = []) => {
+    if (!fs.existsSync(filePath)) {
+        fs.writeFileSync(filePath, JSON.stringify(defaultData, null, 2));
+    }
+};
+
+initDataFile(questionsFile, [
+    {
+        "id": 1,
+        "text": "Jakie są podstawowe zasady bezpieczeństwa w sieci?",
+        "maxPoints": 2
+    },
+    {
+        "id": 2,
+        "text": "Wymień trzy najważniejsze protokoły sieciowe.",
+        "maxPoints": 3
+    },
+    {
+        "id": 3,
+        "text": "Co to jest firewall i jakie są jego funkcje?",
+        "maxPoints": 3
+    },
+    {
+        "id": 4,
+        "text": "Opisz różnice między TCP a UDP.",
+        "maxPoints": 4
+    },
+    {
+        "id": 5,
+        "text": "Jak działa system DNS?",
+        "maxPoints": 3
+    }
+]);
+
+// Initialize users file with hashed passwords
+initDataFile(usersFile, [
+    {
+        "id": 0,
+        "username": "superadmin", 
+        "password": hashPassword("superadmin123"),
+        "role": "superadmin",
+        "name": "Super Administrator"
+    },
+    {
+        "id": 1,
+        "username": "admin",
+        "password": hashPassword("admin123"),
+        "role": "administrator",
+        "name": "Administrator"
+    },
+    {
+        "id": 2,
+        "username": "teacher",
+        "password": hashPassword("teacher123"),
+        "role": "cmd",
+        "name": "Nauczyciel"
+    },
+    {
+        "id": 3,
+        "username": "user",
+        "password": hashPassword("user123"),
+        "role": "user",
+        "name": "Użytkownik"
+    }
+]);
+
+// Helper functions for JSON files
+const readQuestions = () => {
+    try {
+        const data = fs.readFileSync(questionsFile, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.error('Error reading questions:', error);
+        return [];
+    }
+};
+
+const readUsers = () => {
+    try {
+        const data = fs.readFileSync(usersFile, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.error('Error reading users:', error);
+        return [];
+    }
+};
+
+const writeUsers = (users) => {
+    try {
+        fs.writeFileSync(usersFile, JSON.stringify(users, null, 2));
+        return true;
+    } catch (error) {
+        console.error('Error writing users:', error);
+        return false;
+    }
+};
 
 // Logging middleware
 app.use((req, res, next) => {
@@ -52,15 +160,20 @@ const verifyToken = async (token) => {
     const parts = token.split('_');
     if (parts.length === 3) {
         const userId = parseInt(parts[1]);
-        return await db.getUserById(userId);
+        const users = readUsers();
+        const user = users.find(u => u.id === userId);
+        if (user) {
+            const { password: _, ...userWithoutPassword } = user;
+            return userWithoutPassword;
+        }
     }
     return null;
 };
 
-// Get questions
-app.get('/api/questions', async (req, res) => {
+// Get questions (z JSON)
+app.get('/api/questions', (req, res) => {
     try {
-        const questions = await db.getAllQuestions();
+        const questions = readQuestions();
         res.json(questions);
     } catch (error) {
         console.error('Error fetching questions:', error);
@@ -68,10 +181,10 @@ app.get('/api/questions', async (req, res) => {
     }
 });
 
-// Get all results
+// Get all results (z SQLite)
 app.get('/api/results', async (req, res) => {
     try {
-        const results = await db.getAllResults();
+        const results = await resultsDb.getAllResults();
         
         // Transform results to match frontend format
         const transformedResults = results.map(result => ({
@@ -89,7 +202,7 @@ app.get('/api/results', async (req, res) => {
             bonusPoints: result.bonus_points,
             notes: result.notes,
             conductorName: result.conductor_name,
-            conductorId: result.conductor_id?.toString(),
+            conductorId: result.conductor_id,
             questionResults: result.question_results ? JSON.parse(result.question_results) : null
         }));
 
@@ -100,11 +213,11 @@ app.get('/api/results', async (req, res) => {
     }
 });
 
-// Get results by type
+// Get results by type (z SQLite)
 app.get('/api/results/:type', async (req, res) => {
     try {
         const { type } = req.params;
-        const results = await db.getResultsByType(type);
+        const results = await resultsDb.getResultsByType(type);
         
         // Transform results to match frontend format
         const transformedResults = results.map(result => ({
@@ -122,7 +235,7 @@ app.get('/api/results/:type', async (req, res) => {
             bonusPoints: result.bonus_points,
             notes: result.notes,
             conductorName: result.conductor_name,
-            conductorId: result.conductor_id?.toString(),
+            conductorId: result.conductor_id,
             questionResults: result.question_results ? JSON.parse(result.question_results) : null
         }));
 
@@ -133,7 +246,7 @@ app.get('/api/results/:type', async (req, res) => {
     }
 });
 
-// Add new result
+// Add new result (do SQLite)
 app.post('/api/results', async (req, res) => {
     try {
         const newResult = req.body;
@@ -143,7 +256,7 @@ app.post('/api/results', async (req, res) => {
             return res.status(400).json({ error: 'Nick and examType are required' });
         }
 
-        const result = await db.addResult(newResult);
+        const result = await resultsDb.addResult(newResult);
         
         // Return the created result with the new ID
         const createdResult = {
@@ -159,11 +272,11 @@ app.post('/api/results', async (req, res) => {
     }
 });
 
-// Delete result by ID
+// Delete result by ID (z SQLite)
 app.delete('/api/results/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await db.deleteResult(parseInt(id));
+        const result = await resultsDb.deleteResult(parseInt(id));
         
         if (result.changes === 0) {
             return res.status(404).json({ error: 'Result not found' });
@@ -177,10 +290,10 @@ app.delete('/api/results/:id', async (req, res) => {
     }
 });
 
-// Get statistics
+// Get statistics (z SQLite)
 app.get('/api/stats', async (req, res) => {
     try {
-        const stats = await db.getStats();
+        const stats = await resultsDb.getStats();
         res.json(stats);
     } catch (error) {
         console.error('Error generating stats:', error);
@@ -188,8 +301,8 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
-// Authentication endpoint
-app.post('/api/auth/login', async (req, res) => {
+// Authentication endpoint (z JSON)
+app.post('/api/auth/login', (req, res) => {
     try {
         const { username, password } = req.body;
         
@@ -200,7 +313,8 @@ app.post('/api/auth/login', async (req, res) => {
             return res.status(400).json({ error: 'Username and password are required' });
         }
 
-        const foundUser = await db.getUserByUsername(username);
+        const users = readUsers();
+        const foundUser = users.find(u => u.username === username);
         
         if (!foundUser) {
             return res.status(401).json({ error: 'User not found' });
@@ -208,17 +322,12 @@ app.post('/api/auth/login', async (req, res) => {
         
         const hashedPassword = hashPassword(password);
         
-        if (foundUser.password_hash === hashedPassword) {
+        if (foundUser.password === hashedPassword) {
             console.log('✅ Login successful for:', username);
-            const userResponse = {
-                id: foundUser.id,
-                username: foundUser.username,
-                role: foundUser.role,
-                name: foundUser.name
-            };
+            const { password: _, ...userWithoutPassword } = foundUser;
             res.json({
                 success: true,
-                user: userResponse,
+                user: userWithoutPassword,
                 token: `token_${foundUser.id}_${Date.now()}`
             });
         } else {
@@ -231,7 +340,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// Verify token endpoint
+// Verify token endpoint (z JSON)
 app.post('/api/auth/verify', async (req, res) => {
     try {
         const { token } = req.body;
@@ -248,7 +357,7 @@ app.post('/api/auth/verify', async (req, res) => {
     }
 });
 
-// Get all users (admin only)
+// Get all users (z JSON - admin only)
 app.get('/api/users', async (req, res) => {
     try {
         const authHeader = req.headers.authorization;
@@ -265,9 +374,10 @@ app.get('/api/users', async (req, res) => {
         console.log('Token verification - User:', user.username, 'Role:', user.role);
         
         if (user.role === 'superadmin' || user.role === 'administrator') {
-            const users = await db.getAllUsers();
-            console.log('Returning users:', users.length);
-            res.json(users);
+            const users = readUsers();
+            const usersWithoutPasswords = users.map(({ password, ...user }) => user);
+            console.log('Returning users:', usersWithoutPasswords.length);
+            res.json(usersWithoutPasswords);
         } else {
             console.log('Access denied - not admin');
             res.status(403).json({ error: 'Access denied. Admin role required.' });
@@ -302,16 +412,31 @@ app.post('/api/users', async (req, res) => {
             return res.status(400).json({ error: 'All fields are required' });
         }
 
+        const users = readUsers();
+        
         // Check if username exists
-        const existingUser = await db.getUserByUsername(username);
-        if (existingUser) {
+        if (users.find(u => u.username === username)) {
             return res.status(400).json({ error: 'Username already exists' });
         }
 
-        const result = await db.addUser({ username, password, role, name });
-        const newUser = await db.getUserById(result.id);
+        const nextId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
         
-        res.status(201).json(newUser);
+        const newUser = {
+            id: nextId,
+            username,
+            password: hashPassword(password),
+            role,
+            name
+        };
+
+        users.push(newUser);
+        
+        if (writeUsers(users)) {
+            const { password: _, ...userWithoutPassword } = newUser;
+            res.status(201).json(userWithoutPassword);
+        } else {
+            res.status(500).json({ error: 'Failed to save user' });
+        }
     } catch (error) {
         console.error('Error creating user:', error);
         res.status(500).json({ error: 'Failed to create user' });
@@ -333,26 +458,28 @@ app.put('/api/users/:id', async (req, res) => {
         const targetUserId = parseInt(req.params.id);
         const { username, password, role, name } = req.body;
         
-        const targetUser = await db.getUserById(targetUserId);
-        if (!targetUser) {
+        const users = readUsers();
+        const userIndex = users.findIndex(u => u.id === targetUserId);
+        
+        if (userIndex === -1) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // Prevent editing other superadmin accounts
-        const fullTargetUser = await db.get("SELECT * FROM users WHERE id = ?", [targetUserId]);
-        if (fullTargetUser.role === 'superadmin' && targetUserId !== currentUser.id) {
+        if (users[userIndex].role === 'superadmin' && targetUserId !== currentUser.id) {
             return res.status(403).json({ error: 'Cannot edit superadmin account' });
         }
 
-        const updateData = { username, role, name };
-        if (password) {
-            updateData.password = password;
-        }
+        if (username) users[userIndex].username = username;
+        if (password) users[userIndex].password = hashPassword(password);
+        if (role) users[userIndex].role = role;
+        if (name) users[userIndex].name = name;
 
-        await db.updateUser(targetUserId, updateData);
-        const updatedUser = await db.getUserById(targetUserId);
-        
-        res.json(updatedUser);
+        if (writeUsers(users)) {
+            const { password: _, ...userWithoutPassword } = users[userIndex];
+            res.json(userWithoutPassword);
+        } else {
+            res.status(500).json({ error: 'Failed to update user' });
+        }
     } catch (error) {
         console.error('Error updating user:', error);
         res.status(500).json({ error: 'Failed to update user' });
@@ -373,19 +500,24 @@ app.delete('/api/users/:id', async (req, res) => {
 
         const targetUserId = parseInt(req.params.id);
         
-        // Prevent deleting superadmin accounts
-        const targetUser = await db.get("SELECT * FROM users WHERE id = ?", [targetUserId]);
+        const users = readUsers();
+        const targetUser = users.find(u => u.id === targetUserId);
+        
         if (targetUser && targetUser.role === 'superadmin') {
             return res.status(403).json({ error: 'Cannot delete superadmin account' });
         }
 
-        const result = await db.deleteUser(targetUserId);
+        const filteredUsers = users.filter(u => u.id !== targetUserId);
         
-        if (result.changes === 0) {
+        if (filteredUsers.length === users.length) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        res.json({ message: 'User deleted successfully' });
+        if (writeUsers(filteredUsers)) {
+            res.json({ message: 'User deleted successfully' });
+        } else {
+            res.status(500).json({ error: 'Failed to delete user' });
+        }
     } catch (error) {
         console.error('Error deleting user:', error);
         res.status(500).json({ error: 'Failed to delete user' });
@@ -409,16 +541,26 @@ app.post('/api/auth/change-password', async (req, res) => {
             return res.status(400).json({ error: 'Current password and new password are required' });
         }
 
-        // Verify current password
-        const fullUser = await db.get("SELECT * FROM users WHERE id = ?", [user.id]);
+        const users = readUsers();
+        const userIndex = users.findIndex(u => u.id === user.id);
+        
+        if (userIndex === -1) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
         const currentPasswordHash = hashPassword(currentPassword);
         
-        if (fullUser.password_hash !== currentPasswordHash) {
+        if (users[userIndex].password !== currentPasswordHash) {
             return res.status(400).json({ error: 'Current password is incorrect' });
         }
 
-        await db.changePassword(user.id, newPassword);
-        res.json({ message: 'Password changed successfully' });
+        users[userIndex].password = hashPassword(newPassword);
+        
+        if (writeUsers(users)) {
+            res.json({ message: 'Password changed successfully' });
+        } else {
+            res.status(500).json({ error: 'Failed to update password' });
+        }
     } catch (error) {
         console.error('Error changing password:', error);
         res.status(500).json({ error: 'Failed to change password' });
@@ -430,8 +572,12 @@ app.get('/api/health', (req, res) => {
     res.json({ 
         status: 'OK', 
         timestamp: new Date().toISOString(), 
-        version: '2.0.0',
-        database: 'SQLite'
+        version: '2.0.0-hybrid',
+        storage: {
+            results: 'SQLite',
+            users: 'JSON',
+            questions: 'JSON'
+        }
     });
 });
 
@@ -449,12 +595,20 @@ app.use('*', (req, res) => {
 // Initialize database and start server
 async function startServer() {
     try {
-        await db.init();
+        await resultsDb.init();
         
         app.listen(PORT, '0.0.0.0', () => {
             console.log(`✅ Server running on port ${PORT}`);
             console.log(`📊 API endpoints available at http://0.0.0.0:${PORT}/api/`);
-            console.log(`💾 SQLite database located at: ${path.join(__dirname, 'data', 'exams.db')}`);
+            console.log(`💾 Storage:`);
+            console.log(`   Results: SQLite database (${path.join(__dirname, 'data', 'results.db')})`);
+            console.log(`   Users: JSON file (${usersFile})`);
+            console.log(`   Questions: JSON file (${questionsFile})`);
+            console.log(`🔑 Default accounts:`);
+            console.log(`   superadmin / superadmin123`);
+            console.log(`   admin / admin123`);
+            console.log(`   teacher / teacher123`);
+            console.log(`   user / user123`);
         });
     } catch (error) {
         console.error('❌ Failed to start server:', error);
@@ -465,7 +619,7 @@ async function startServer() {
 // Graceful shutdown
 process.on('SIGINT', async () => {
     console.log('\n🛑 Shutting down server...');
-    await db.close();
+    await resultsDb.close();
     process.exit(0);
 });
 

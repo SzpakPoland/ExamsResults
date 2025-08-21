@@ -1,7 +1,9 @@
 import type { ExamResult, Question, User, UserFormData } from '@/types'
 
 // Change this to your VPS URL - TUTAJ ZMIEŃ NA IP VPS
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://162.19.246.158:3001/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api'
+
+console.log('API_BASE_URL:', API_BASE_URL) // Debug log
 
 export const getQuestions = async (): Promise<Question[]> => {
   try {
@@ -222,6 +224,58 @@ export const changePassword = async (currentPassword: string, newPassword: strin
     return true
   } catch (error) {
     console.error('Error changing password:', error)
+    throw error
+  }
+}
+
+// Add auth functions
+export const login = async (username: string, password: string) => {
+  console.log('Login attempt to:', `${API_BASE_URL}/auth/login`)
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+    })
+
+    console.log('Login response status:', response.status)
+    console.log('Login response headers:', Object.fromEntries(response.headers.entries()))
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Login error response:', errorText)
+      throw new Error(`HTTP ${response.status}: ${errorText}`)
+    }
+
+    const data = await response.json()
+    console.log('Login success data:', data)
+    return data
+  } catch (error) {
+    console.error('Login network error:', error)
+    throw error
+  }
+}
+
+export const verifyToken = async (token: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Token verification failed')
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error('Token verification error:', error)
     throw error
   }
 }

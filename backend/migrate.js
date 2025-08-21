@@ -1,26 +1,26 @@
 const fs = require('fs');
 const path = require('path');
-const { Database } = require('./database');
+const { ResultsDatabase } = require('./database');
 
-async function migrateData() {
-    console.log('🔄 Starting data migration from JSON to SQLite...');
+async function migrateResults() {
+    console.log('🔄 Starting results migration from JSON to SQLite...');
     
-    const db = new Database();
-    await db.init();
+    const resultsDb = new ResultsDatabase();
+    await resultsDb.init();
     
     const dataDir = path.join(__dirname, 'data');
+    const resultsJsonPath = path.join(dataDir, 'results.json');
     
     try {
-        // Migrate results if JSON file exists
-        const resultsJsonPath = path.join(dataDir, 'results.json');
         if (fs.existsSync(resultsJsonPath)) {
             console.log('📄 Found results.json, migrating...');
             
             const resultsData = JSON.parse(fs.readFileSync(resultsJsonPath, 'utf8'));
+            let migratedCount = 0;
             
             for (const result of resultsData) {
                 try {
-                    await db.addResult({
+                    await resultsDb.addResult({
                         nick: result.nick,
                         date: result.date,
                         attempt: result.attempt,
@@ -36,7 +36,8 @@ async function migrateData() {
                         conductorId: result.conductorId,
                         questionResults: result.questionResults
                     });
-                    console.log(`✅ Migrated result for: ${result.nick}`);
+                    migratedCount++;
+                    console.log(`✅ Migrated result ${migratedCount}: ${result.nick} (${result.examType})`);
                 } catch (err) {
                     console.error(`❌ Failed to migrate result for ${result.nick}:`, err.message);
                 }
@@ -46,28 +47,30 @@ async function migrateData() {
             const backupPath = path.join(dataDir, `results_backup_${Date.now()}.json`);
             fs.renameSync(resultsJsonPath, backupPath);
             console.log(`📦 Backed up original results.json to: ${backupPath}`);
+            console.log(`✅ Migration completed! Migrated ${migratedCount}/${resultsData.length} results.`);
+        } else {
+            console.log('📄 No results.json found - starting with fresh SQLite database');
         }
         
-        console.log('✅ Migration completed successfully!');
-        
         // Show statistics
-        const stats = await db.getStats();
+        const stats = await resultsDb.getStats();
         console.log('📊 Database statistics:');
         console.log(`   Total results: ${stats.total}`);
         console.log(`   Passed: ${stats.passed}`);
         console.log(`   Failed: ${stats.failed}`);
         console.log(`   Pass rate: ${stats.passRate}%`);
+        console.log(`   By type: sprawdzanie=${stats.byType.sprawdzanie}, ortografia=${stats.byType.ortografia}, dokumenty=${stats.byType.dokumenty}`);
         
     } catch (error) {
         console.error('❌ Migration failed:', error);
     } finally {
-        await db.close();
+        await resultsDb.close();
     }
 }
 
 // Run migration if this file is executed directly
 if (require.main === module) {
-    migrateData();
+    migrateResults();
 }
 
-module.exports = { migrateData };
+module.exports = { migrateResults };

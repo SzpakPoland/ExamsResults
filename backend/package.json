@@ -1,11 +1,12 @@
 {
   "name": "exams-results-backend",
-  "version": "1.0.0",
-  "description": "Backend for Exams Results System",
+  "version": "2.0.0",
+  "description": "Backend for Exams Results System (Hybrid: SQLite + JSON)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "migrate": "node migrate.js"
   },
   "dependencies": {
     "body-parser": "^1.20.2",

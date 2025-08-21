@@ -1,15 +1,9 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const crypto = require('crypto');
 
-const DB_PATH = path.join(__dirname, 'data', 'exams.db');
+const DB_PATH = path.join(__dirname, 'data', 'results.db');
 
-// Hash password function
-const hashPassword = (password) => {
-    return crypto.createHash('sha256').update(password).digest('hex');
-};
-
-class Database {
+class ResultsDatabase {
     constructor() {
         this.db = null;
     }
@@ -18,35 +12,19 @@ class Database {
         return new Promise((resolve, reject) => {
             this.db = new sqlite3.Database(DB_PATH, (err) => {
                 if (err) {
-                    console.error('Error opening database:', err.message);
+                    console.error('Error opening results database:', err.message);
                     reject(err);
                 } else {
-                    console.log('✅ Connected to SQLite database');
-                    this.createTables().then(resolve).catch(reject);
+                    console.log('✅ Connected to Results SQLite database');
+                    this.createResultsTable().then(resolve).catch(reject);
                 }
             });
         });
     }
 
-    async createTables() {
-        const tables = [
-            `CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE NOT NULL,
-                password_hash TEXT NOT NULL,
-                role TEXT NOT NULL CHECK (role IN ('superadmin', 'administrator', 'cmd', 'user')),
-                name TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            )`,
-            
-            `CREATE TABLE IF NOT EXISTS questions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                text TEXT NOT NULL,
-                max_points INTEGER NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            )`,
-            
-            `CREATE TABLE IF NOT EXISTS exam_results (
+    async createResultsTable() {
+        const sql = `
+            CREATE TABLE IF NOT EXISTS exam_results (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nick TEXT NOT NULL,
                 date TEXT,
@@ -59,97 +37,15 @@ class Database {
                 errors INTEGER,
                 bonus_points INTEGER,
                 notes TEXT,
-                conductor_id INTEGER,
+                conductor_id TEXT,
                 conductor_name TEXT,
                 question_results TEXT, -- JSON dla sprawdzanie
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (conductor_id) REFERENCES users(id)
-            )`
-        ];
-
-        for (const sql of tables) {
-            await this.run(sql);
-        }
-
-        await this.seedInitialData();
-    }
-
-    async seedInitialData() {
-        // Check if users exist
-        const userCount = await this.get("SELECT COUNT(*) as count FROM users");
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `;
         
-        if (userCount.count === 0) {
-            console.log('🌱 Seeding initial users...');
-            const users = [
-                {
-                    username: 'superadmin',
-                    password: hashPassword('superadmin123'),
-                    role: 'superadmin',
-                    name: 'Super Administrator'
-                },
-                {
-                    username: 'admin',
-                    password: hashPassword('admin123'),
-                    role: 'administrator',
-                    name: 'Administrator'
-                },
-                {
-                    username: 'teacher',
-                    password: hashPassword('teacher123'),
-                    role: 'cmd',
-                    name: 'Nauczyciel'
-                },
-                {
-                    username: 'user',
-                    password: hashPassword('user123'),
-                    role: 'user',
-                    name: 'Użytkownik'
-                }
-            ];
-
-            for (const user of users) {
-                await this.run(
-                    "INSERT INTO users (username, password_hash, role, name) VALUES (?, ?, ?, ?)",
-                    [user.username, user.password, user.role, user.name]
-                );
-            }
-        }
-
-        // Check if questions exist
-        const questionCount = await this.get("SELECT COUNT(*) as count FROM questions");
-        
-        if (questionCount.count === 0) {
-            console.log('🌱 Seeding initial questions...');
-            const questions = [
-                {
-                    text: "Jakie są podstawowe zasady bezpieczeństwa w sieci?",
-                    maxPoints: 2
-                },
-                {
-                    text: "Wymień trzy najważniejsze protokoły sieciowe.",
-                    maxPoints: 3
-                },
-                {
-                    text: "Co to jest firewall i jakie są jego funkcje?",
-                    maxPoints: 3
-                },
-                {
-                    text: "Opisz różnice między TCP a UDP.",
-                    maxPoints: 4
-                },
-                {
-                    text: "Jak działa system DNS?",
-                    maxPoints: 3
-                }
-            ];
-
-            for (const question of questions) {
-                await this.run(
-                    "INSERT INTO questions (text, max_points) VALUES (?, ?)",
-                    [question.text, question.maxPoints]
-                );
-            }
-        }
+        await this.run(sql);
+        console.log('📊 Results table created/verified');
     }
 
     // Promisified database methods
@@ -189,23 +85,19 @@ class Database {
         });
     }
 
-    // Exam Results methods
+    // Results methods
     async getAllResults() {
         return await this.all(`
-            SELECT er.*, u.name as conductor_full_name 
-            FROM exam_results er 
-            LEFT JOIN users u ON er.conductor_id = u.id 
-            ORDER BY er.timestamp DESC
+            SELECT * FROM exam_results 
+            ORDER BY timestamp DESC
         `);
     }
 
     async getResultsByType(examType) {
         return await this.all(`
-            SELECT er.*, u.name as conductor_full_name 
-            FROM exam_results er 
-            LEFT JOIN users u ON er.conductor_id = u.id 
-            WHERE er.exam_type = ? 
-            ORDER BY er.timestamp DESC
+            SELECT * FROM exam_results 
+            WHERE exam_type = ? 
+            ORDER BY timestamp DESC
         `, [examType]);
     }
 
@@ -272,67 +164,13 @@ class Database {
         };
     }
 
-    // Questions methods
-    async getAllQuestions() {
-        return await this.all("SELECT * FROM questions ORDER BY id");
-    }
-
-    // Users methods
-    async getAllUsers() {
-        return await this.all("SELECT id, username, role, name, created_at FROM users ORDER BY id");
-    }
-
-    async getUserByUsername(username) {
-        return await this.get("SELECT * FROM users WHERE username = ?", [username]);
-    }
-
-    async getUserById(id) {
-        return await this.get("SELECT id, username, role, name, created_at FROM users WHERE id = ?", [id]);
-    }
-
-    async addUser(userData) {
-        const sql = "INSERT INTO users (username, password_hash, role, name) VALUES (?, ?, ?, ?)";
-        return await this.run(sql, [
-            userData.username,
-            hashPassword(userData.password),
-            userData.role,
-            userData.name
-        ]);
-    }
-
-    async updateUser(id, userData) {
-        let sql = "UPDATE users SET username = ?, role = ?, name = ?";
-        let params = [userData.username, userData.role, userData.name];
-        
-        if (userData.password) {
-            sql += ", password_hash = ?";
-            params.push(hashPassword(userData.password));
-        }
-        
-        sql += " WHERE id = ?";
-        params.push(id);
-        
-        return await this.run(sql, params);
-    }
-
-    async deleteUser(id) {
-        return await this.run("DELETE FROM users WHERE id = ?", [id]);
-    }
-
-    async changePassword(id, newPassword) {
-        return await this.run(
-            "UPDATE users SET password_hash = ? WHERE id = ?",
-            [hashPassword(newPassword), id]
-        );
-    }
-
     close() {
         return new Promise((resolve) => {
             this.db.close((err) => {
                 if (err) {
-                    console.error('Error closing database:', err.message);
+                    console.error('Error closing results database:', err.message);
                 } else {
-                    console.log('📴 Database connection closed');
+                    console.log('📴 Results database connection closed');
                 }
                 resolve();
             });
@@ -340,4 +178,4 @@ class Database {
     }
 }
 
-module.exports = { Database, hashPassword };
+module.exports = { ResultsDatabase };
