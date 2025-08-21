@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { BarChart3, Calendar, User, CheckCircle, XCircle, RefreshCw, Eye, X, ChevronLeft, ChevronRight, Search, Trash2 } from 'lucide-react'
-import Layout from '@/components/ui/Layout'
+import { BarChart3, Calendar, User, CheckCircle, XCircle, RefreshCw, Eye, X, ChevronLeft, ChevronRight, Search, Trash2, UserCheck } from 'lucide-react'
+import Layout, { useTestConductor } from '@/components/ui/Layout'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { getResults, getResultsByType, deleteResult } from '@/utils/storage'
 import type { ExamResult } from '@/types'
@@ -145,6 +145,19 @@ export default function ResultsPage() {
           <p className="font-bold text-sm">{result.percentage}%</p>
         </div>
       </div>
+
+      {/* Conductor Information */}
+      {result.conductorName && (
+        <div className="mb-4 p-3 bg-indigo-50/50 rounded-lg border border-indigo-200">
+          <div className="flex items-center">
+            <UserCheck className="w-4 h-4 text-indigo-600 mr-2" />
+            <div className="flex-1">
+              <p className="text-xs text-indigo-600 font-medium">Przeprowadzający test</p>
+              <p className="text-sm font-semibold text-indigo-800">{result.conductorName}</p>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="flex justify-between items-center mt-4">
         <span className={`px-2 py-1 rounded text-xs font-medium ${
@@ -210,6 +223,22 @@ export default function ResultsPage() {
               </p>
             </div>
           </div>
+
+          {/* Conductor Information */}
+          {result.conductorName && (
+            <div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+              <div className="flex items-center">
+                <UserCheck className="w-6 h-6 text-indigo-600 mr-3" />
+                <div>
+                  <p className="text-sm text-indigo-600 font-medium">Przeprowadzający test</p>
+                  <p className="text-lg font-bold text-indigo-800">{result.conductorName}</p>
+                  {result.conductorId && (
+                    <p className="text-xs text-indigo-600">ID: {result.conductorId}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Score Details */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -292,6 +321,9 @@ export default function ResultsPage() {
           <div className="text-sm text-gray-500 border-t border-gray-200 pt-4">
             <p>Dodano: {new Date(result.timestamp).toLocaleString('pl-PL')}</p>
             {result.attempt && <p>Podejście: {result.attempt}</p>}
+            {result.conductorName && (
+              <p>Przeprowadzający: {result.conductorName}</p>
+            )}
           </div>
         </div>
       </motion.div>
@@ -469,6 +501,12 @@ export default function ResultsPage() {
                     </th>
                     <th className="text-left py-4 px-6 font-semibold text-gray-700">Typ</th>
                     <th className="text-left py-4 px-6 font-semibold text-gray-700">Data</th>
+                    <th className="text-left py-4 px-6 font-semibold text-gray-700">
+                      <div className="flex items-center">
+                        <UserCheck className="w-4 h-4 mr-2" />
+                        Przeprowadzający
+                      </div>
+                    </th>
                     <th className="text-center py-4 px-6 font-semibold text-gray-700">Wynik</th>
                     <th className="text-center py-4 px-6 font-semibold text-gray-700">Procent</th>
                     <th className="text-center py-4 px-6 font-semibold text-gray-700">Status</th>
@@ -516,6 +554,14 @@ export default function ResultsPage() {
                           <div className="flex items-center">
                             <Calendar className="w-4 h-4 text-gray-400 mr-2" />
                             <span className="text-gray-700">{result.date || 'Brak daty'}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="flex items-center">
+                            <UserCheck className="w-4 h-4 text-indigo-400 mr-2" />
+                            <span className="text-gray-700 text-sm">
+                              {result.conductorName || 'Nieznany'}
+                            </span>
                           </div>
                         </td>
                         <td className="py-4 px-6 text-center">

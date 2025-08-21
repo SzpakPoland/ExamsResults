@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { BookOpen, User, Calendar, MessageSquare, Save, CheckCircle, XCircle } from 'lucide-react'
-import Layout from '@/components/ui/Layout'
+import Layout, { useTestConductor } from '@/components/ui/Layout'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { saveResult, getQuestions } from '@/utils/storage'
 import type { ExamResult, SprawdzanieFormData, Question, QuestionResult } from '@/types'
@@ -20,6 +20,7 @@ export default function SprawdzaniePage() {
   const [result, setResult] = useState<ExamResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [pageLoading, setPageLoading] = useState(true)
+  const conductorInfo = useTestConductor()
 
   useEffect(() => {
     loadQuestions()
@@ -124,7 +125,9 @@ export default function SprawdzaniePage() {
         timestamp: new Date().toISOString(),
         examType: 'sprawdzanie',
         questionResults: formData.questionResults,
-        notes: formData.notes
+        notes: formData.notes,
+        conductorName: conductorInfo.conductorName,
+        conductorId: conductorInfo.conductorId
       }
 
       await saveResult(newResult)

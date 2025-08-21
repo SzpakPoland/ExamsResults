@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { FileText, User, Calendar, Target, Trophy, Save, CheckCircle, XCircle, MessageSquare } from 'lucide-react'
-import Layout from '@/components/ui/Layout'
+import Layout, { useTestConductor } from '@/components/ui/Layout'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { saveResult } from '@/utils/storage'
 import type { ExamResult, DokumentyFormData } from '@/types'
@@ -20,6 +20,7 @@ export default function DokumentyPage() {
   const [result, setResult] = useState<ExamResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [pageLoading, setPageLoading] = useState(true)
+  const conductorInfo = useTestConductor()
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -57,7 +58,9 @@ export default function DokumentyPage() {
         passed,
         timestamp: new Date().toISOString(),
         examType: 'dokumenty',
-        notes: formData.notes || ''
+        notes: formData.notes || '',
+        conductorName: conductorInfo.conductorName,
+        conductorId: conductorInfo.conductorId
       }
 
       await saveResult(newResult)

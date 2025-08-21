@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { PenTool, User, RotateCcw, Percent, Save, CheckCircle, XCircle, MessageSquare } from 'lucide-react'
-import Layout from '@/components/ui/Layout'
+import { PenTool, User, RotateCcw, Percent, Save, CheckCircle, XCircle, MessageSquare, Calendar } from 'lucide-react'
+import Layout, { useTestConductor } from '@/components/ui/Layout'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { saveResult } from '@/utils/storage'
 import type { ExamResult, OrtografiaFormData } from '@/types'
@@ -19,6 +19,8 @@ export default function OrtografiaPage() {
   const [result, setResult] = useState<ExamResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [pageLoading, setPageLoading] = useState(true)
+
+  const conductorInfo = useTestConductor()
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -56,7 +58,9 @@ export default function OrtografiaPage() {
         timestamp: new Date().toISOString(),
         examType: 'ortografia',
         notes: formData.notes,
-        errors
+        errors,
+        conductorName: conductorInfo.conductorName,
+        conductorId: conductorInfo.conductorId
       }
 
       await saveResult(newResult)
@@ -168,6 +172,21 @@ export default function OrtografiaPage() {
 
             <div>
               <label className="label">
+                <Calendar className="w-4 h-4 inline mr-2" />
+                Data
+              </label>
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleInputChange}
+                className="input"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="label">
                 <RotateCcw className="w-4 h-4 inline mr-2" />
                 Podejście
               </label>
@@ -178,9 +197,9 @@ export default function OrtografiaPage() {
                 className="input"
                 required
               >
-                <option value="Pierwsze">Pierwsze podejście</option>
-                <option value="Drugie">Drugie podejście</option>
-                <option value="Inne">Inne</option>
+                <option value="1">Pierwsze podejście</option>
+                <option value="2">Drugie podejście</option>
+                <option value="3">Trzecie podejście</option>
               </select>
             </div>
 
