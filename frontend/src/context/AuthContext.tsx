@@ -1,6 +1,7 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import { login as apiLogin, verifyToken as apiVerifyToken } from '@/utils/storage'
 import type { AuthState, User } from '@/types'
 
 interface AuthContextType extends AuthState {
@@ -9,12 +10,10 @@ interface AuthContextType extends AuthState {
   isLoading: boolean
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | null>(null)
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://162.19.246.158:3001/api'
-
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [authState, setAuthState] = useState<AuthState>({
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [state, setState] = useState<AuthState>({
     isAuthenticated: false,
     user: null,
     token: null
@@ -22,49 +21,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Check for stored token on app start
-    const storedToken = localStorage.getItem('auth-token')
-    if (storedToken) {
-      verifyToken(storedToken)
-    } else {
-      setIsLoading(false)
-    }
+    checkAuthState()
   }, [])
 
-  const verifyToken = async (token: string) => {
+  const checkAuthState = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/verify`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setAuthState({
-          isAuthenticated: true,
-          user: data.user,
-          token
-        })
-      } else {
-        // Invalid token, remove it
-        localStorage.removeItem('auth-token')
-        setAuthState({
-          isAuthenticated: false,
-          user: null,
-          token: null
-        })
+      console.log('Checking auth state...')
+      const token = localStorage.getItem('auth-token')
+      console.log('Stored token:', token)
+      
+      if (token) {
+        const response = await apiVerifyToken(token)
+        console.log('Token verification response:', response)
+        
+        if (response.valid && response.user) {
+          setState({
+            isAuthenticated: true,
+            user: response.user,
+            token
+          })
+          console.log('User authenticated:', response.user)
+        } else {
+          localStorage.removeItem('auth-token')
+          console.log('Token invalid, removed from storage')
+        }
       }
     } catch (error) {
-      console.error('Token verification failed:', error)
+      console.error('Auth check failed:', error)
       localStorage.removeItem('auth-token')
-      setAuthState({
-        isAuthenticated: false,
-        user: null,
-        token: null
-      })
     } finally {
       setIsLoading(false)
     }
@@ -72,60 +56,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
-      const apiUrl = `${API_BASE_URL}/auth/login`;
-      console.log('Attempting login to:', apiUrl);
-      console.log('API_BASE_URL:', API_BASE_URL);
+      console.log('=== AuthContext Login ===')
+      console.log('Username:', username)
+      console.log('Attempting login...')
       
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      })
+      const response = await apiLogin(username, password)
+      console.log('Login API response:', response)
 
-      console.log('Response status:', response.status)
-      console.log('Response ok:', response.ok)
-
-      if (response.ok) {
-        const data = await response.json()
-        console.log('Login successful:', data)
-        const newAuthState = {
+      if (response.success && response.user && response.token) {
+        localStorage.setItem('auth-token', response.token)
+        setState({
           isAuthenticated: true,
-          user: data.user,
-          token: data.token
-        }
-        
-        setAuthState(newAuthState)
-        localStorage.setItem('auth-token', data.token)
+          user: response.user,
+          token: response.token
+        })
+        console.log('✅ Login successful, user set:', response.user)
         return true
       } else {
-        const errorData = await response.json()
-        console.error('Login failed:', errorData)
+        console.log('❌ Login failed - invalid response format:', response)
         return false
       }
-    } catch (error) {
-      console.error('Network error during login:', error)
+    } catch (error: any) {
+      console.error('❌ Login error:', error)
       return false
     }
   }
 
   const logout = () => {
     localStorage.removeItem('auth-token')
-    setAuthState({
+    setState({
       isAuthenticated: false,
       user: null,
       token: null
     })
+    console.log('User logged out')
   }
 
   return (
-    <AuthContext.Provider value={{
-      ...authState,
-      login,
-      logout,
-      isLoading
-    }}>
+    <AuthContext.Provider value={{ ...state, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   )
@@ -133,7 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider')
   }
   return context

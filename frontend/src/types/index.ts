@@ -12,6 +12,8 @@ export interface ExamResult {
   errors?: number;
   bonusPoints?: number;
   notes?: string;
+  conductorName?: string;  // Dodane
+  conductorId?: string;    // Dodane
   questionResults?: Array<{
     questionId: number;
     pointsEarned: number;
