@@ -7,7 +7,7 @@ import type { AuthState, User } from '@/types'
 interface AuthContextType extends AuthState {
   login: (username: string, password: string) => Promise<boolean>
   logout: () => void
-  loading: boolean
+  isLoading: boolean
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -18,7 +18,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user: null,
     token: null
   })
-  const [loading, setLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     checkAuthState()
@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Auth check failed:', error)
       localStorage.removeItem('auth-token')
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ ...state, login, logout, loading }}>
+    <AuthContext.Provider value={{ ...state, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   )
