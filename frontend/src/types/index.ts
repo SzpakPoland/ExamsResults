@@ -19,6 +19,10 @@ export interface ExamResult {
     pointsEarned: number;
     passed: boolean;
   }>;
+  errorsList?: Array<{
+    id: number;
+    description: string;
+  }>; // Dodane pole dla listy błędów
 }
 
 export interface Question {
@@ -39,6 +43,11 @@ export interface SprawdzanieFormData {
   questionResults: QuestionResult[];
   bonusPoints: number;
   notes: string;
+  errorsCount: number; // Dodane pole dla liczby błędów
+  errorsList: Array<{
+    id: number;
+    description: string;
+  }>; // Dodane pole dla opisu błędów
 }
 
 export interface OrtografiaFormData {

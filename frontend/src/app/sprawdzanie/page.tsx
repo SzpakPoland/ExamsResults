@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { BookOpen, User, Calendar, MessageSquare, Save, CheckCircle, XCircle } from 'lucide-react'
+import { BookOpen, User, Calendar, MessageSquare, Save, CheckCircle, XCircle, AlertTriangle, Plus, X } from 'lucide-react'
 import Layout, { useTestConductor } from '@/components/ui/Layout'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { saveResult, getQuestions } from '@/utils/storage'
@@ -14,7 +14,9 @@ export default function SprawdzaniePage() {
     date: '',
     questionResults: [],
     bonusPoints: 0,
-    notes: ''
+    notes: '',
+    errorsCount: 0,
+    errorsList: []
   })
   const [questions, setQuestions] = useState<Question[]>([])
   const [result, setResult] = useState<ExamResult | null>(null)
@@ -55,7 +57,41 @@ export default function SprawdzaniePage() {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'bonusPoints' ? parseInt(value) || 0 : value
+      [name]: name === 'bonusPoints' || name === 'errorsCount' ? parseInt(value) || 0 : value
+    }))
+  }
+
+  const handleErrorsCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const count = parseInt(e.target.value) || 0
+    const currentErrorsList = [...formData.errorsList]
+    
+    // Jeśli zwiększamy liczbę błędów, dodaj nowe puste błędy
+    if (count > currentErrorsList.length) {
+      for (let i = currentErrorsList.length; i < count; i++) {
+        currentErrorsList.push({
+          id: Date.now() + i,
+          description: ''
+        })
+      }
+    }
+    // Jeśli zmniejszamy, usuń nadmiarowe błędy
+    else if (count < currentErrorsList.length) {
+      currentErrorsList.splice(count)
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      errorsCount: count,
+      errorsList: currentErrorsList
+    }))
+  }
+
+  const handleErrorDescriptionChange = (errorId: number, description: string) => {
+    setFormData(prev => ({
+      ...prev,
+      errorsList: prev.errorsList.map(error =>
+        error.id === errorId ? { ...error, description } : error
+      )
     }))
   }
 
@@ -78,21 +114,18 @@ export default function SprawdzaniePage() {
   }
 
   const calculateResults = () => {
-    if (questions.length === 0) return { totalMaxPoints: 0, earnedPoints: 0, totalPoints: 0, percentage: 0, passed: false }
+    if (questions.length === 0) return { totalMaxPoints: 0, earnedPoints: 0, totalPoints: 0, percentage: 0, passed: false, pointsAfterErrors: 0 }
     
     const baseMaxPoints = questions.reduce((sum, q) => sum + q.maxPoints, 0)
-    const totalMaxPoints = baseMaxPoints + formData.bonusPoints // Dodaj bonusy do puli wszystkich punktów
+    const totalMaxPoints = baseMaxPoints + formData.bonusPoints
     const earnedPoints = formData.questionResults.reduce((sum, qr) => sum + qr.pointsEarned, 0)
-    const totalPoints = earnedPoints + formData.bonusPoints // Dodaj bonusy do zdobytych punktów
     
-    console.log('Calculation debug:', {
-      questionsCount: questions.length,
-      baseMaxPoints,
-      bonusPoints: formData.bonusPoints,
-      totalMaxPoints,
-      earnedPoints,
-      totalPoints
-    })
+    // Odejmij punkty za błędy (1 punkt za każdy błąd) - POPRAWKA
+    const pointsAfterErrors = Math.max(0, earnedPoints - formData.errorsCount)
+    const totalPoints = pointsAfterErrors + formData.bonusPoints
+    
+    // USUŃ DEBUG LOG - spamuje konsolę
+    // console.log('Calculation debug:', { ... })
     
     const percentage = totalMaxPoints > 0 ? (totalPoints / totalMaxPoints) * 100 : 0
     const passed = percentage >= 75
@@ -100,6 +133,7 @@ export default function SprawdzaniePage() {
     return {
       totalMaxPoints,
       earnedPoints,
+      pointsAfterErrors,
       totalPoints,
       percentage: Math.round(percentage * 100) / 100,
       passed
@@ -112,6 +146,12 @@ export default function SprawdzaniePage() {
     
     try {
       const { totalMaxPoints, totalPoints, percentage, passed } = calculateResults()
+
+      // Użyj wszystkich błędów z opisami
+      const allErrorsList = formData.errorsList.map((error, index) => ({
+        id: error.id || Date.now() + index,
+        description: error.description || `Błąd ${index + 1} - brak opisu`
+      }))
 
       const newResult: ExamResult = {
         id: Date.now(),
@@ -126,6 +166,8 @@ export default function SprawdzaniePage() {
         examType: 'sprawdzanie',
         questionResults: formData.questionResults,
         notes: formData.notes,
+        errors: formData.errorsCount,
+        errorsList: allErrorsList,
         conductorName: conductorInfo.conductorName,
         conductorId: conductorInfo.conductorId
       }
@@ -141,7 +183,9 @@ export default function SprawdzaniePage() {
           pointsEarned: 0
         })),
         bonusPoints: 0,
-        notes: ''
+        notes: '',
+        errorsCount: 0,
+        errorsList: []
       })
     } catch (error) {
       console.error('Error submitting result:', error)
@@ -161,7 +205,9 @@ export default function SprawdzaniePage() {
         pointsEarned: 0
       })),
       bonusPoints: 0,
-      notes: ''
+      notes: '',
+      errorsCount: 0,
+      errorsList: []
     })
   }
 
@@ -192,12 +238,16 @@ export default function SprawdzaniePage() {
               </div>
             </motion.div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
               <div className="text-center p-4 bg-blue-50/50 rounded-xl">
                 <p className="text-sm text-blue-600 font-medium">Punkty za pytania</p>
                 <p className="text-2xl font-bold text-blue-700">
                   {result.questionResults?.reduce((sum, qr) => sum + qr.pointsEarned, 0) || 0}
                 </p>
+              </div>
+              <div className="text-center p-4 bg-red-50/50 rounded-xl">
+                <p className="text-sm text-red-600 font-medium">Błędy</p>
+                <p className="text-2xl font-bold text-red-700">-{result.errors || 0}</p>
               </div>
               <div className="text-center p-4 bg-green-50/50 rounded-xl">
                 <p className="text-sm text-green-600 font-medium">Punkty dodatkowe</p>
@@ -208,20 +258,31 @@ export default function SprawdzaniePage() {
                 <p className="text-2xl font-bold text-purple-700">{result.percentage}%</p>
               </div>
             </div>
-            
-            <div className="text-center mb-8 p-6 bg-gradient-to-r from-gray-50/50 to-blue-50/50 rounded-xl">
-              <p className="text-sm text-gray-600 font-medium mb-2">Wynik końcowy</p>
-              <p className="text-3xl font-bold gradient-text">
-                {result.totalPoints} / {result.maxPoints} punktów
-              </p>
-            </div>
 
-            {result.notes && (
-              <div className="mb-8 p-4 bg-yellow-50/50 rounded-xl">
-                <p className="text-sm text-yellow-700 font-medium mb-2">Notatki:</p>
-                <p className="text-gray-700">{result.notes}</p>
+            {/* Lista błędów */}
+            {result.errorsList && result.errorsList.length > 0 && (
+              <div className="mb-8 p-4 bg-red-50/50 rounded-xl border border-red-200">
+                <h3 className="text-lg font-bold text-red-800 mb-3 flex items-center">
+                  <AlertTriangle className="w-5 h-5 mr-2" />
+                  Wykryte błędy ({result.errorsList.length})
+                </h3>
+                <div className="space-y-2">
+                  {result.errorsList.map((error, index) => (
+                    <div key={error.id} className="flex items-start">
+                      <span className="text-red-600 font-bold mr-2">{index + 1}.</span>
+                      <p className="text-red-700">{error.description}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
+
+            <div className="text-center mb-8 p-6 bg-gradient-to-r from-gray-50/50 to-purple-50/50 rounded-xl backdrop-blur-sm">
+              <p className="text-sm text-gray-600 font-medium mb-2">Wynik końcowy</p>
+              <p className="text-3xl font-bold gradient-text">
+                {result.totalPoints} / {result.maxPoints} punktów ({result.percentage}%)
+              </p>
+            </div>
             
             <button onClick={resetForm} className="btn btn-primary w-full text-lg">
               Dodaj kolejny wynik
@@ -232,7 +293,7 @@ export default function SprawdzaniePage() {
     )
   }
 
-  const { totalMaxPoints, totalPoints, percentage, passed } = calculateResults()
+  const { totalMaxPoints, totalPoints, earnedPoints, pointsAfterErrors, percentage, passed } = calculateResults()
 
   return (
     <Layout title="Test Sprawdzania">
@@ -394,6 +455,45 @@ export default function SprawdzaniePage() {
                   />
                 </div>
 
+                {/* Nowe pole dla błędów */}
+                <div>
+                  <label className="label">
+                    <AlertTriangle className="w-4 h-4 inline mr-2" />
+                    Liczba błędów (każdy błąd = -1 pkt)
+                  </label>
+                  <input
+                    type="number"
+                    name="errorsCount"
+                    min="0"
+                    value={formData.errorsCount}
+                    onChange={handleErrorsCountChange}
+                    className="input"
+                  />
+                </div>
+
+                {/* Pola opisu błędów */}
+                {formData.errorsCount > 0 && (
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-gray-700 flex items-center">
+                      <AlertTriangle className="w-4 h-4 mr-2 text-red-600" />
+                      Opisy błędów:
+                    </h4>
+                    {formData.errorsList.map((error, index) => (
+                      <div key={error.id} className="relative">
+                        <label className="label text-sm">
+                          Błąd {index + 1}:
+                        </label>
+                        <textarea
+                          value={error.description}
+                          onChange={(e) => handleErrorDescriptionChange(error.id, e.target.value)}
+                          className="input min-h-[60px] resize-none"
+                          placeholder={`Opisz błąd ${index + 1}...`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <div>
                   <label className="label">
                     <MessageSquare className="w-4 h-4 inline mr-2" />
@@ -414,9 +514,12 @@ export default function SprawdzaniePage() {
                   <div className="text-sm space-y-1">
                     <p><strong>Pytania załadowane:</strong> {questions.length}</p>
                     <p><strong>Punkty bazowe:</strong> {questions.reduce((sum, q) => sum + q.maxPoints, 0)}</p>
+                    <p><strong>Punkty za pytania:</strong> {earnedPoints}</p>
+                    <p><strong>Błędy:</strong> -{formData.errorsCount}</p>
+                    <p><strong>Po błędach:</strong> {pointsAfterErrors}</p>
                     <p><strong>Punkty dodatkowe:</strong> +{formData.bonusPoints}</p>
                     <p><strong>Maksymalne punkty:</strong> {totalMaxPoints}</p>
-                    <p><strong>Zdobyte punkty:</strong> {totalPoints}</p>
+                    <p><strong>Końcowy wynik:</strong> {totalPoints}</p>
                     <p><strong>Procent:</strong> {percentage.toFixed(1)}%</p>
                     <p className={`font-bold ${passed ? 'text-green-700' : 'text-red-700'}`}>
                       Status: {passed ? 'ZALICZONY' : 'NIEZALICZONY'}

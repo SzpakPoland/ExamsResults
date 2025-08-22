@@ -1,9 +1,7 @@
 import type { ExamResult, Question, User, UserFormData } from '@/types'
 
-// Change this to your VPS URL - TUTAJ ZMIEŃ NA IP VPS
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api'
 
-console.log('API_BASE_URL:', API_BASE_URL) // Debug log
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api'
 
 export const getQuestions = async (): Promise<Question[]> => {
   try {
@@ -22,6 +20,19 @@ export const getQuestions = async (): Promise<Question[]> => {
 
 export const saveResult = async (result: ExamResult): Promise<void> => {
   try {
+    console.log('=== FRONTEND SAVE DEBUG ===')
+    console.log('Sending result to backend:', result)
+    console.log('ErrorsList in request:', result.errorsList)
+    console.log('ErrorsList type:', typeof result.errorsList)
+    console.log('ErrorsList is array:', Array.isArray(result.errorsList))
+    console.log('ErrorsList length:', result.errorsList?.length)
+    
+    if (result.errorsList && Array.isArray(result.errorsList)) {
+      result.errorsList.forEach((error, index) => {
+        console.log(`Frontend Error ${index + 1}:`, error)
+      })
+    }
+
     const response = await fetch(`${API_BASE_URL}/results`, {
       method: 'POST',
       headers: {
@@ -30,10 +41,17 @@ export const saveResult = async (result: ExamResult): Promise<void> => {
       body: JSON.stringify(result),
     })
 
+    console.log('Backend response status:', response.status)
+
     if (!response.ok) {
       const error = await response.json()
+      console.error('Backend error response:', error)
       throw new Error(error.message || 'Failed to save result')
     }
+
+    const savedResult = await response.json()
+    console.log('Backend returned saved result:', savedResult)
+    console.log('Returned errorsList:', savedResult.errorsList)
   } catch (error) {
     console.error('Error saving result:', error)
     throw error
@@ -48,7 +66,8 @@ export const getResults = async (): Promise<ExamResult[]> => {
       throw new Error('Failed to fetch results')
     }
 
-    return await response.json()
+    const data = await response.json()
+    return data
   } catch (error) {
     console.error('Error fetching results:', error)
     return []

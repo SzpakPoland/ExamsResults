@@ -7,7 +7,7 @@ const crypto = require('crypto');
 const { ResultsDatabase } = require('./database');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Initialize results database
 const resultsDb = new ResultsDatabase();
@@ -144,7 +144,7 @@ const writeUsers = (users) => {
 
 // Logging middleware
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   if (req.body && Object.keys(req.body).length > 0) {
     console.log('Request body:', req.body);
   }
@@ -181,114 +181,9 @@ app.get('/api/questions', (req, res) => {
     }
 });
 
-// Get all results (z SQLite)
-app.get('/api/results', async (req, res) => {
-    try {
-        const results = await resultsDb.getAllResults();
-        
-        // Transform results to match frontend format
-        const transformedResults = results.map(result => ({
-            id: result.id,
-            nick: result.nick,
-            date: result.date,
-            attempt: result.attempt,
-            totalPoints: result.total_points,
-            maxPoints: result.max_points,
-            percentage: result.percentage,
-            passed: Boolean(result.passed),
-            timestamp: result.timestamp,
-            examType: result.exam_type,
-            errors: result.errors,
-            bonusPoints: result.bonus_points,
-            notes: result.notes,
-            conductorName: result.conductor_name,
-            conductorId: result.conductor_id,
-            questionResults: result.question_results ? JSON.parse(result.question_results) : null
-        }));
-
-        res.json(transformedResults);
-    } catch (error) {
-        console.error('Error fetching results:', error);
-        res.status(500).json({ error: 'Failed to fetch results' });
-    }
-});
-
-// Get results by type (z SQLite)
-app.get('/api/results/:type', async (req, res) => {
-    try {
-        const { type } = req.params;
-        const results = await resultsDb.getResultsByType(type);
-        
-        // Transform results to match frontend format
-        const transformedResults = results.map(result => ({
-            id: result.id,
-            nick: result.nick,
-            date: result.date,
-            attempt: result.attempt,
-            totalPoints: result.total_points,
-            maxPoints: result.max_points,
-            percentage: result.percentage,
-            passed: Boolean(result.passed),
-            timestamp: result.timestamp,
-            examType: result.exam_type,
-            errors: result.errors,
-            bonusPoints: result.bonus_points,
-            notes: result.notes,
-            conductorName: result.conductor_name,
-            conductorId: result.conductor_id,
-            questionResults: result.question_results ? JSON.parse(result.question_results) : null
-        }));
-
-        res.json(transformedResults);
-    } catch (error) {
-        console.error('Error fetching filtered results:', error);
-        res.status(500).json({ error: 'Failed to fetch filtered results' });
-    }
-});
-
-// Add new result (do SQLite)
-app.post('/api/results', async (req, res) => {
-    try {
-        const newResult = req.body;
-        
-        // Validate required fields
-        if (!newResult.nick || !newResult.examType) {
-            return res.status(400).json({ error: 'Nick and examType are required' });
-        }
-
-        const result = await resultsDb.addResult(newResult);
-        
-        // Return the created result with the new ID
-        const createdResult = {
-            id: result.id,
-            timestamp: new Date().toISOString(),
-            ...newResult
-        };
-        
-        res.status(201).json(createdResult);
-    } catch (error) {
-        console.error('Error saving result:', error);
-        res.status(500).json({ error: 'Failed to save result' });
-    }
-});
-
-// Delete result by ID (z SQLite)
-app.delete('/api/results/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const result = await resultsDb.deleteResult(parseInt(id));
-        
-        if (result.changes === 0) {
-            return res.status(404).json({ error: 'Result not found' });
-        }
-        
-        console.log(`Result ${id} deleted successfully`);
-        res.json({ message: 'Result deleted successfully' });
-    } catch (error) {
-        console.error('Error deleting result:', error);
-        res.status(500).json({ error: 'Failed to delete result' });
-    }
-});
+// NEW ENDPOINTS USING OUR CONTROLLER
+const resultsRoutes = require('./routes/results');
+app.use('/api/results', resultsRoutes);
 
 // Get statistics (z SQLite)
 app.get('/api/stats', async (req, res) => {
@@ -622,5 +517,15 @@ process.on('SIGINT', async () => {
     await resultsDb.close();
     process.exit(0);
 });
+
+console.log('🚀 Starting server with debug info...')
+console.log('📁 Loading models and controllers...')
+
+// Sprawdź czy używamy odpowiednich plików
+const ExamResult = require('./models/ExamResult')
+const resultsController = require('./controllers/resultsController')
+
+console.log('✅ ExamResult model loaded')
+console.log('✅ resultsController loaded')
 
 startServer();

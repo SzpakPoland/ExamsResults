@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { BarChart3, Calendar, User, CheckCircle, XCircle, RefreshCw, Eye, X, ChevronLeft, ChevronRight, Search, Trash2, UserCheck, BookOpen, PenTool, FileText } from 'lucide-react'
+import { BarChart3, Calendar, User, CheckCircle, XCircle, RefreshCw, Eye, X, ChevronLeft, ChevronRight, Search, Trash2, UserCheck, BookOpen, PenTool, FileText, AlertTriangle } from 'lucide-react'
 import Layout, { useTestConductor } from '@/components/ui/Layout'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { getResults, getResultsByType, deleteResult } from '@/utils/storage'
@@ -185,150 +185,200 @@ export default function ResultsPage() {
   )
 
   // Details Modal Component
-  const DetailsModal = ({ result, onClose }: { result: ExamResult, onClose: () => void }) => (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <motion.div
-        className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Szczegóły wyniku - {result.nick}
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="p-6">
-          {/* Basic Info */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="text-center p-4 bg-gray-50 rounded-xl">
-              <p className="text-sm text-gray-600 font-medium">Typ egzaminu</p>
-              <p className="text-lg font-bold text-gray-800 capitalize">{result.examType}</p>
-            </div>
-            <div className="text-center p-4 bg-gray-50 rounded-xl">
-              <p className="text-sm text-gray-600 font-medium">Data</p>
-              <p className="text-lg font-bold text-gray-800">{result.date}</p>
-            </div>
-            <div className="text-center p-4 bg-gray-50 rounded-xl">
-              <p className="text-sm text-gray-600 font-medium">Status</p>
-              <p className={`text-lg font-bold ${result.passed ? 'text-green-600' : 'text-red-600'}`}>
-                {result.passed ? 'ZALICZONY' : 'NIEZALICZONY'}
-              </p>
-            </div>
+  const DetailsModal = ({ result, onClose }: { result: ExamResult, onClose: () => void }) => {
+    // Poprawka: domyślnie errorsList to pusty array jeśli undefined
+    const errorsList = Array.isArray(result.errorsList) ? result.errorsList : [];
+    const hasValidErrorsList = errorsList.length > 0;
+    const hasErrorsWithDescriptions = errorsList.some(error =>
+      error && typeof error.description === 'string' && error.description.trim() !== ''
+    );
+    
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <motion.div
+          className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-gray-800">
+              Szczegóły wyniku - {result.nick}
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
-          {/* Conductor Information */}
-          {result.conductorName && (
-            <div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
-              <div className="flex items-center">
-                <UserCheck className="w-6 h-6 text-indigo-600 mr-3" />
-                <div>
-                  <p className="text-sm text-indigo-600 font-medium">Przeprowadzający test</p>
-                  <p className="text-lg font-bold text-indigo-800">{result.conductorName}</p>
-                  {result.conductorId && (
-                    <p className="text-xs text-indigo-600">ID: {result.conductorId}</p>
-                  )}
+          <div className="p-6">
+            {/* Basic Info */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="text-center p-4 bg-gray-50 rounded-xl">
+                <p className="text-sm text-gray-600 font-medium">Typ egzaminu</p>
+                <p className="text-lg font-bold text-gray-800 capitalize">{result.examType}</p>
+              </div>
+              <div className="text-center p-4 bg-gray-50 rounded-xl">
+                <p className="text-sm text-gray-600 font-medium">Data</p>
+                <p className="text-lg font-bold text-gray-800">{result.date}</p>
+              </div>
+              <div className="text-center p-4 bg-gray-50 rounded-xl">
+                <p className="text-sm text-gray-600 font-medium">Status</p>
+                <p className={`text-lg font-bold ${result.passed ? 'text-green-600' : 'text-red-600'}`}>
+                  {result.passed ? 'ZALICZONY' : 'NIEZALICZONY'}
+                </p>
+              </div>
+            </div>
+
+            {/* Conductor Information */}
+            {result.conductorName && (
+              <div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+                <div className="flex items-center">
+                  <UserCheck className="w-6 h-6 text-indigo-600 mr-3" />
+                  <div>
+                    <p className="text-sm text-indigo-600 font-medium">Przeprowadzający test</p>
+                    <p className="text-lg font-bold text-indigo-800">{result.conductorName}</p>
+                    {result.conductorId && (
+                      <p className="text-xs text-indigo-600">ID: {result.conductorId}</p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Score Details */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="text-center p-4 bg-blue-50 rounded-xl">
-              <p className="text-sm text-blue-600 font-medium">Punkty</p>
-              <p className="text-2xl font-bold text-blue-700">{result.totalPoints}/{result.maxPoints}</p>
+            {/* Score Details */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div className="text-center p-4 bg-blue-50 rounded-xl">
+                <p className="text-sm text-blue-600 font-medium">Punkty</p>
+                <p className="text-2xl font-bold text-blue-700">{result.totalPoints}/{result.maxPoints}</p>
+              </div>
+              <div className="text-center p-4 bg-purple-50 rounded-xl">
+                <p className="text-sm text-purple-600 font-medium">Procent</p>
+                <p className="text-2xl font-bold text-purple-700">{result.percentage}%</p>
+              </div>
+              {result.errors !== undefined && (
+                <div className="text-center p-4 bg-red-50 rounded-xl">
+                  <p className="text-sm text-red-600 font-medium">Błędy</p>
+                  <p className="text-2xl font-bold text-red-700">{result.errors}</p>
+                </div>
+              )}
+              {result.bonusPoints !== undefined && (
+                <div className="text-center p-4 bg-green-50 rounded-xl">
+                  <p className="text-sm text-green-600 font-medium">Punkty dodatkowe</p>
+                  <p className="text-2xl font-bold text-green-700">+{result.bonusPoints}</p>
+                </div>
+              )}
             </div>
-            <div className="text-center p-4 bg-purple-50 rounded-xl">
-              <p className="text-sm text-purple-600 font-medium">Procent</p>
-              <p className="text-2xl font-bold text-purple-700">{result.percentage}%</p>
-            </div>
-            {result.errors !== undefined && (
-              <div className="text-center p-4 bg-red-50 rounded-xl">
-                <p className="text-sm text-red-600 font-medium">Błędy</p>
-                <p className="text-2xl font-bold text-red-700">{result.errors}</p>
+
+            {/* USUŃ debug info - już nie potrzebny */}
+            
+            {/* Lista błędów - CZYSTA WERSJA */}
+            {result.examType === 'sprawdzanie' && (
+              <div className="mb-6">
+                <h3 className="text-lg font-bold text-red-800 mb-4 flex items-center">
+                  <AlertTriangle className="w-5 h-5 mr-2" />
+                  Błędy w teście ({result.errors || 0})
+                </h3>
+                {result.errors && result.errors > 0 ? (
+                  hasValidErrorsList ? (
+                    <div className="space-y-3">
+                      {errorsList
+                        .filter(error => error && typeof error.description === 'string')
+                        .map((error, index) => (
+                          <div key={error.id || index} className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <div className="flex items-start">
+                              <span className="text-red-600 font-bold mr-3 mt-1">{index + 1}.</span>
+                              <div className="flex-1">
+                                <p className="text-red-800 font-medium">Błąd #{index + 1}</p>
+                                <p className="text-red-700 mt-1 whitespace-pre-wrap">{error.description || 'Brak opisu'}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                      <p className="text-orange-800 text-center">
+                        ⚠️ Zarejestrowano {result.errors} błędów, ale brak szczegółowych opisów
+                      </p>
+                    </div>
+                  )
+                ) : (
+                  <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                    <p className="text-gray-600 text-center">✅ Brak błędów w tym teście</p>
+                  </div>
+                )}
               </div>
             )}
-            {result.bonusPoints !== undefined && (
-              <div className="text-center p-4 bg-green-50 rounded-xl">
-                <p className="text-sm text-green-600 font-medium">Punkty dodatkowe</p>
-                <p className="text-2xl font-bold text-green-700">+{result.bonusPoints}</p>
-              </div>
-            )}
-          </div>
 
-          {/* Question Details (only for sprawdzanie) */}
-          {result.examType === 'sprawdzanie' && result.questionResults && (
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">Szczegóły odpowiedzi</h3>
-              <div className="space-y-3">
-                {result.questionResults.map((qr, index) => (
-                  <div
-                    key={qr.questionId}
-                    className={`p-4 rounded-lg border-2 ${
-                      qr.passed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
-                    }`}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-800">
-                          <span className="text-primary-600 font-semibold">Pytanie {index + 1}:</span>
-                        </p>
-                        <p className="text-sm text-gray-600 mt-1">
-                          Punkty: {qr.pointsEarned}
-                        </p>
-                      </div>
-                      <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        qr.passed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {qr.passed ? (
-                          <>
-                            <CheckCircle className="w-4 h-4 inline mr-1" />
-                            Zaliczone
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="w-4 h-4 inline mr-1" />
-                            Niezaliczone
-                          </>
-                        )}
+            {/* Question Details (only for sprawdzanie) */}
+            {result.examType === 'sprawdzanie' && result.questionResults && (
+              <div className="mb-6">
+                <h3 className="text-lg font-bold text-gray-800 mb-4">Szczegóły odpowiedzi</h3>
+                <div className="space-y-3">
+                  {result.questionResults.map((qr, index) => (
+                    <div
+                      key={qr.questionId}
+                      className={`p-4 rounded-lg border-2 ${
+                        qr.passed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                      }`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-800">
+                            <span className="text-primary-600 font-semibold">Pytanie {index + 1}:</span>
+                          </p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Punkty: {qr.pointsEarned}
+                          </p>
+                        </div>
+                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          qr.passed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {qr.passed ? (
+                            <>
+                              <CheckCircle className="w-4 h-4 inline mr-1" />
+                              Zaliczone
+                            </>
+                          ) : (
+                            <>
+                              <XCircle className="w-4 h-4 inline mr-1" />
+                              Niezaliczone
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-
-          {/* Notes */}
-          {result.notes && (
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">Notatki</h3>
-              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
-                <p className="text-gray-700 whitespace-pre-wrap">{result.notes}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Additional Info */}
-          <div className="text-sm text-gray-500 border-t border-gray-200 pt-4">
-            <p>Dodano: {new Date(result.timestamp).toLocaleString('pl-PL')}</p>
-            {result.attempt && <p>Podejście: {result.attempt}</p>}
-            {result.conductorName && (
-              <p>Przeprowadzający: {result.conductorName}</p>
             )}
+
+            {/* Notes */}
+            {result.notes && (
+              <div className="mb-6">
+                <h3 className="text-lg font-bold text-gray-800 mb-3">Notatki</h3>
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+                  <p className="text-gray-700 whitespace-pre-wrap">{result.notes}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Additional Info */}
+            <div className="text-sm text-gray-500 border-t border-gray-200 pt-4">
+              <p>Dodano: {new Date(result.timestamp).toLocaleString('pl-PL')}</p>
+              {result.attempt && <p>Podejście: {result.attempt}</p>}
+              {result.conductorName && (
+                <p>Przeprowadzający: {result.conductorName}</p>
+              )}
+            </div>
           </div>
-        </div>
-      </motion.div>
-    </div>
-  )
+        </motion.div>
+      </div>
+    )
+  }
 
   if (loading) {
     return <LoadingSpinner message="Ładowanie wyników egzaminów..." />
