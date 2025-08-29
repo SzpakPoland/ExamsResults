@@ -288,7 +288,7 @@ export default function OrtografiaPage() {
       </motion.div>
 
       
-      {/* Footer */}
+      {}
       <motion.footer 
         className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] mt-auto pt-8 pb-0 border-t border-gray-200/50 shadow-lg"
         style={{ backgroundColor: '#e6e8ebff' }}

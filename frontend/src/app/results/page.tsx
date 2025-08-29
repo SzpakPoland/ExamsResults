@@ -26,7 +26,6 @@ export default function ResultsPage() {
     setLoading(true)
     try {
       const data = await getResults()
-      // Ensure data is an array
       setResults(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Error loading results:', error)
@@ -42,14 +41,13 @@ export default function ResultsPage() {
     if (deleteConfirm === id) {
       try {
         await deleteResult(id)
-        await loadResults() // Refresh results
+        await loadResults() 
         setDeleteConfirm(null)
       } catch (error) {
         console.error('Error deleting result:', error)
       }
     } else {
       setDeleteConfirm(id)
-      // Auto-cancel after 3 seconds
       setTimeout(() => setDeleteConfirm(null), 3000)
     }
   }
@@ -66,12 +64,10 @@ export default function ResultsPage() {
     
     let filtered = results
     
-    // Filter by type
     if (activeFilter !== 'all') {
       filtered = filtered.filter(result => result.examType === activeFilter)
     }
     
-    // Filter by search term (nick)
     if (searchTerm.trim()) {
       filtered = filtered.filter(result => 
         result.nick.toLowerCase().includes(searchTerm.toLowerCase())
@@ -146,7 +142,7 @@ export default function ResultsPage() {
         </div>
       </div>
 
-      {/* Conductor Information */}
+      {}
       {result.conductorName && (
         <div className="mb-4 p-3 bg-indigo-50/50 rounded-lg border border-indigo-200">
           <div className="flex items-center">
@@ -184,9 +180,7 @@ export default function ResultsPage() {
     </motion.div>
   )
 
-  // Details Modal Component
   const DetailsModal = ({ result, onClose }: { result: ExamResult, onClose: () => void }) => {
-    // Poprawka: domyślnie errorsList to pusty array jeśli undefined
     const errorsList = Array.isArray(result.errorsList) ? result.errorsList : [];
     const hasValidErrorsList = errorsList.length > 0;
     const hasErrorsWithDescriptions = errorsList.some(error =>
@@ -214,7 +208,7 @@ export default function ResultsPage() {
           </div>
 
           <div className="p-6">
-            {/* Basic Info */}
+            {}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="text-center p-4 bg-gray-50 rounded-xl">
                 <p className="text-sm text-gray-600 font-medium">Typ egzaminu</p>
@@ -232,7 +226,7 @@ export default function ResultsPage() {
               </div>
             </div>
 
-            {/* Conductor Information */}
+            {}
             {result.conductorName && (
               <div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
                 <div className="flex items-center">
@@ -248,7 +242,7 @@ export default function ResultsPage() {
               </div>
             )}
 
-            {/* Score Details */}
+            {}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <div className="text-center p-4 bg-blue-50 rounded-xl">
                 <p className="text-sm text-blue-600 font-medium">Punkty</p>
@@ -272,9 +266,7 @@ export default function ResultsPage() {
               )}
             </div>
 
-            {/* USUŃ debug info - już nie potrzebny */}
-            
-            {/* Lista błędów - CZYSTA WERSJA */}
+            {}
             {result.examType === 'sprawdzanie' && (
               <div className="mb-6">
                 <h3 className="text-lg font-bold text-red-800 mb-4 flex items-center">
@@ -313,7 +305,8 @@ export default function ResultsPage() {
               </div>
             )}
 
-            {/* Question Details (only for sprawdzanie) */}
+            {}
+          
             {result.examType === 'sprawdzanie' && result.questionResults && (
               <div className="mb-6">
                 <h3 className="text-lg font-bold text-gray-800 mb-4">Szczegóły odpowiedzi</h3>
@@ -356,7 +349,7 @@ export default function ResultsPage() {
               </div>
             )}
 
-            {/* Notes */}
+            {}
             {result.notes && (
               <div className="mb-6">
                 <h3 className="text-lg font-bold text-gray-800 mb-3">Notatki</h3>
@@ -366,7 +359,7 @@ export default function ResultsPage() {
               </div>
             )}
 
-            {/* Additional Info */}
+            {}
             <div className="text-sm text-gray-500 border-t border-gray-200 pt-4">
               <p>Dodano: {new Date(result.timestamp).toLocaleString('pl-PL')}</p>
               {result.attempt && <p>Podejście: {result.attempt}</p>}
@@ -386,7 +379,7 @@ export default function ResultsPage() {
 
   return (
     <Layout title="Wyniki Egzaminów">
-      {/* Filter Buttons */}
+      {}
       <motion.div 
         className="mb-8"
         initial={{ opacity: 0, y: 20 }}
@@ -413,7 +406,7 @@ export default function ResultsPage() {
             ))}
           </div>
           
-          {/* Search Box */}
+          {}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
@@ -442,7 +435,7 @@ export default function ResultsPage() {
           </div>
         </div>
         
-        {/* Search Results Info */}
+        {}
         {searchTerm && (
           <div className="text-sm text-gray-600 mb-4">
             {filteredResults.length > 0 ? (
@@ -454,7 +447,7 @@ export default function ResultsPage() {
         )}
       </motion.div>
 
-      {/* Stats */}
+      {}
       <motion.div 
         className="mb-8"
         initial={{ opacity: 0, y: 20 }}
@@ -514,7 +507,7 @@ export default function ResultsPage() {
         </div>
       </motion.div>
 
-      {/* Results Table */}
+      {}
       <motion.div
         className="card-glass border border-white/30 overflow-hidden"
         initial={{ opacity: 0, y: 30 }}
@@ -671,7 +664,7 @@ export default function ResultsPage() {
               </table>
             </div>
 
-            {/* Pagination */}
+            {}
             {totalPages > 1 && (
               <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-t border-gray-200">
                 <div className="text-sm text-gray-600">
@@ -702,7 +695,7 @@ export default function ResultsPage() {
         )}
       </motion.div>
 
-      {/* Details Modal */}
+      {}
       {selectedResult && (
         <DetailsModal
           result={selectedResult}
@@ -710,7 +703,7 @@ export default function ResultsPage() {
         />
       )}
 
-      {/* Footer */}
+      {}
       <motion.footer 
         className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] mt-auto pt-8 pb-0 border-t border-gray-200/50 shadow-lg"
         style={{ backgroundColor: '#e6e8ebff' }}

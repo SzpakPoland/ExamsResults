@@ -11,7 +11,7 @@ export default function AccountPage() {
   const { user } = useAuth()
   const [activeTab, setActiveTab] = useState<'password' | 'profile'>('password')
   
-  // Password change state
+  
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -67,7 +67,7 @@ export default function AccountPage() {
   return (
     <Layout title="Zarządzanie kontem">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
+        {}
         <div className="card-glass border border-white/30 p-6 mb-8">
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl flex items-center justify-center shadow-lg">
@@ -80,7 +80,7 @@ export default function AccountPage() {
           </div>
         </div>
 
-        {/* Tabs */}
+        {}
         <div className="flex space-x-2 mb-6">
           <button
             onClick={() => setActiveTab('password')}
@@ -107,7 +107,7 @@ export default function AccountPage() {
           </button>
         </div>
 
-        {/* Password Change Tab */}
+        {}
         {activeTab === 'password' && (
           <div className="card-glass border border-white/30 p-8">
             <h2 className="text-xl font-bold text-gray-800 mb-6">Zmiana hasła</h2>
@@ -225,7 +225,7 @@ export default function AccountPage() {
           </div>
         )}
 
-        {/* Profile Tab */}
+        {}
         {activeTab === 'profile' && (
           <div className="card-glass border border-white/30 p-8">
             <h2 className="text-xl font-bold text-gray-800 mb-6">Informacje o koncie</h2>

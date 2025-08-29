@@ -113,7 +113,7 @@ export default function AdminPage() {
     setFormData({ username: '', password: '', role: 'user', name: '' })
   }
 
-  // Check if user is superadmin
+ 
   if (user?.role !== 'superadmin') {
     return (
       <Layout title="Brak dostępu">
@@ -132,14 +132,14 @@ export default function AdminPage() {
   return (
     <Layout title="Panel Administracyjny">
       <div className="max-w-6xl mx-auto">
-        {/* Debug info */}
+        {}
         <div className="mb-4 p-4 bg-yellow-50 rounded-lg">
           <p className="text-sm">Debug: Current user: {user?.username} (role: {user?.role})</p>
           <p className="text-sm">Users loaded: {users.length}</p>
           {error && <p className="text-sm text-red-600">Error: {error}</p>}
         </div>
 
-        {/* Header */}
+        {}
         <motion.div 
           className="mb-8"
           initial={{ opacity: 0, y: 20 }}
@@ -165,7 +165,7 @@ export default function AdminPage() {
           </div>
         </motion.div>
 
-        {/* Create/Edit Form */}
+        {}
         {(showCreateForm || editingUser) && (
           <motion.div 
             className="card-glass p-6 mb-8 border-2 border-blue-200"
@@ -255,7 +255,7 @@ export default function AdminPage() {
           </motion.div>
         )}
 
-        {/* Users List */}
+        {}
         <motion.div 
           className="card-glass border-2 border-white/30"
           initial={{ opacity: 0, y: 20 }}
@@ -329,7 +329,7 @@ export default function AdminPage() {
       </div>
 
       
-      {/* Footer */}
+      {}
       <motion.footer 
         className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] mt-auto pt-8 pb-0 border-t border-gray-200/50 shadow-lg"
         style={{ backgroundColor: '#e6e8ebff' }}
